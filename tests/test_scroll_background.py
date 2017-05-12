@@ -18,17 +18,22 @@ def scroll_bg():
     return ScrollBackground(background, display_area, limit_scrolling=True)
 
 
-def test_limit_scrolling(scroll_bg):
+@pytest.fixture
+def scroll_surf(scroll_bg):
+    """Fixture that returns a pygame Surface.
+    """
+    return pg.Surface(scroll_bg.display_area.size)
+
+
+def test_limit_scrolling(scroll_bg, scroll_surf):
     """
     Test that limit_scrolling keeps display_area inside scrolling_area.
     """
-    surf = pg.Surface(scroll_bg.display_area.size)
-    scroll_bg.scroll(surf, (500, 0))
+    scroll_bg.scroll(scroll_surf, (500, 0))
     assert scroll_bg.scrolling_area.contains(scroll_bg.display_area)
 
-def test_scroll(scroll_bg):
+def test_scroll(scroll_bg, scroll_surf):
     """Test that display_area is moved correctly.
     """
-    surf = pg.Surface(scroll_bg.display_area.size)
-    scroll_bg.scroll(surf, (50, 50))
+    scroll_bg.scroll(scroll_surf, (50, 50))
     assert scroll_bg.topleft == (350, 350)
