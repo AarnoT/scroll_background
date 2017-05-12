@@ -25,3 +25,10 @@ def test_limit_scrolling(scroll_bg):
     surf = pg.Surface(scroll_bg.display_area.size)
     scroll_bg.scroll(surf, (500, 0))
     assert scroll_bg.scrolling_area.contains(scroll_bg.display_area)
+
+def test_scroll(scroll_bg):
+    """Test that display_area is moved correctly.
+    """
+    surf = pg.Surface(scroll_bg.display_area.size)
+    scroll_bg.scroll(surf, (50, 50))
+    assert scroll_bg.topleft == (350, 350)
