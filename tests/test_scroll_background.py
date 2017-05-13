@@ -100,20 +100,14 @@ def test_redraw_areas(scroll_bg_limited):
     """Redraw areas should be inside scrolling_area
     when scrolling is limited.
     """
-    redraw_positions, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+    redraw_positions, _ = scroll_bg_limited._calculate_redraw_areas(
         Vector2(50, 50))
-    redraw_rect1 = pg.Rect(redraw_positions[0], redraw_areas[0].size)
-    redraw_rect2 = pg.Rect(redraw_positions[1], redraw_areas[1].size)
-    scroll_bg_limited.scroll(50, 50)
-    assert (scroll_bg_limited.scrolling_area.contains(redraw_rect1) and
-            scroll_bg_limited.scrolling_area.contains(redraw_rect2))
-    redraw_positions, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+    assert redraw_positions[0] == (350, 350)
+    assert redraw_positions[1] == (350, 350)
+    redraw_positions, _ = scroll_bg_limited._calculate_redraw_areas(
         Vector2(-50, -50))
-    redraw_rect1 = pg.Rect(redraw_positions[0], redraw_areas[0].size)
-    redraw_rect2 = pg.Rect(redraw_positions[1], redraw_areas[1].size)
-    scroll_bg_limited.scroll(-50, -50)
-    assert (scroll_bg_limited.scrolling_area.contains(redraw_rect1) and
-            scroll_bg_limited.scrolling_area.contains(redraw_rect2))
+    assert redraw_positions[0] == (250, 250)
+    assert redraw_positions[1] == (250, 250)
 
 
 def test_redraw_area_size(scroll_bg_limited):
@@ -121,5 +115,9 @@ def test_redraw_area_size(scroll_bg_limited):
     """
     _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
         Vector2(50, 50))
+    assert redraw_areas[0].size == (50, 800)
+    assert redraw_areas[1].size == (800, 50)
+    _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+        Vector2(-50, -50))
     assert redraw_areas[0].size == (50, 800)
     assert redraw_areas[1].size == (800, 50)
