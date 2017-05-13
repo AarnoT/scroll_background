@@ -25,7 +25,7 @@ def scroll_bg_limited():
 @pytest.fixture
 def scroll_bg():
     """Fixture that returns a ScrollBackground instance
-    with limited_scrolling as True.
+    with limited_scrolling as False.
     """
     background = pg.Surface((800, 800))
     surf = pg.Surface((200, 200))
@@ -59,7 +59,7 @@ def test_limit_scrolling(scroll_bg_limited):
 def test_not_limited_scrolling(scroll_bg):
     """Test that scrolling isn't limited
     """
-    scroll_bg.scroll((800, 800))
+    scroll_bg.scroll((700, 700))
     assert scroll_bg.display_pos == (1000, 1000)
     scroll_bg.scroll((-1200, -1200))
     assert scroll_bg.display_pos == (-200, -200)
