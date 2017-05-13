@@ -115,9 +115,9 @@ def test_redraw_area_size(scroll_bg_limited):
     """
     _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
         Vector2(50, 50))
-    assert redraw_areas[0].size == (50, 800)
-    assert redraw_areas[1].size == (800, 50)
+    assert redraw_areas[0].size == (50, 200)
+    assert redraw_areas[1].size == (200, 50)
     _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
         Vector2(-50, -50))
-    assert redraw_areas[0].size == (50, 800)
-    assert redraw_areas[1].size == (800, 50)
+    assert redraw_areas[0].size == (50, 200)
+    assert redraw_areas[1].size == (200, 50)
