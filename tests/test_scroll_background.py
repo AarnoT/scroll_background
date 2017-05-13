@@ -10,34 +10,36 @@ pg.init()
 
 
 @pytest.fixture
-def scroll_bg():
-    """Fixture that returns a ScrollBackground instance.
+def scroll_bg_limited():
+    """
+    Fixture that returns a ScrollBackground instance
+    with limited_scrolling as True.
     """
     background = pg.Surface((800, 800))
-    display_area = pg.Rect(300, 300, 200, 200)
-    return ScrollBackground(background, display_area, limit_scrolling=True)
+    surf = pg.Surface((200, 200))
+    scrolling_area = (0, 0, 800, 800)
+    return ScrollBackground(background, surf, (300, 300),
+                            scrolling_area=scrolling_area,
+                            limited_scrolling=True)
 
 
-@pytest.fixture
-def scroll_surf(scroll_bg):
-    """Fixture that returns a pygame Surface.
-    """
-    return pg.Surface(scroll_bg.display_area.size)
-
-
-def test_limit_scrolling(scroll_bg, scroll_surf):
+def test_limit_scrolling(scroll_bg_limited):
     """
     Test that limit_scrolling keeps display_area inside scrolling_area.
     """
-    scroll_bg.scroll(scroll_surf, (500, 0))
-    assert scroll_bg.scrolling_area.contains(scroll_bg.display_area)
+    scroll_bg_limited.scroll((500, 0))
+    assert scroll_bg_limited.display_pos == (600, 300)
+    scroll_bg_limited.scroll((-800, -800))
+    assert scroll_bg_limited.display_pos == (0, 0)
 
 
-def test_scroll(scroll_bg, scroll_surf):
+def test_scroll(scroll_bg_limited):
     """Test that display_area is moved correctly.
     """
-    scroll_bg.scroll(scroll_surf, (50, 50))
-    assert scroll_bg.topleft == (350, 350)
+    scroll_bg_limited.scroll((50, 50))
+    assert scroll_bg_limited.scrolling_pos == (350, 350)
+    scroll_bg_limited.scroll((-50, -50))
+    assert scroll_bg_limited.scrolling_pos == (300, 300)
 
 
 def compare_surfaces(surface1, surface2):
@@ -53,9 +55,10 @@ def compare_surfaces(surface1, surface2):
     return mask1.count() == mask2.count() == 0
 
 
-def test_scroll_output(scroll_bg, scroll_surf):
+def test_scroll_output(scroll_bg_limited):
     """Test that the scroll surface looks correct after scrolling.
     """
-    correct_surf = scroll_bg.background.subsurface(scroll_bg.scrolling_rect)
-    scroll_bg.scroll(scroll_surf, (50, 50))
-    assert compare_surfaces(correct_surf, scroll_surf)
+    correct_surf = scroll_bg_limited.background.subsurface(
+        scroll_bg_limited.scrolling_rect)
+    scroll_bg_limited.scroll((50, 50))
+    assert compare_surfaces(correct_surf, scroll_bg_limited.display)
