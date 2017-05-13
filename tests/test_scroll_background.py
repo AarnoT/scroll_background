@@ -29,10 +29,21 @@ def scroll_bg():
     """
     background = pg.Surface((800, 800))
     surf = pg.Surface((200, 200))
-    scrolling_area = (0, 0, 800, 800)
+    scrolling_area = pg.Rect(0, 0, 800, 800)
     return ScrollBackground(background, surf, (300, 300),
                             scrolling_area=scrolling_area,
                             limited_scrolling=False)
+
+
+def test_too_small_scrolling_area():
+    """A ValueError should be raised if scrolling_area us too small.
+    """
+    background = pg.Surface((400, 400))
+    surf = pg.Surface((800, 800))
+    with pytest.raises(ValueError):
+        ScrollBackground(background, surf, (0, 0),
+                         scrolling_area=(0, 0, 400, 400),
+                         limited_scrolling=True)
 
 
 def test_limit_scrolling(scroll_bg_limited):
