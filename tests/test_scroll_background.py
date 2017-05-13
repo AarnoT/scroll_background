@@ -114,3 +114,12 @@ def test_redraw_areas(scroll_bg_limited):
     scroll_bg_limited.scroll(-50, -50)
     assert (scroll_bg_limited.scrolling_area.contains(redraw_rect1) and
             scroll_bg_limited.scrolling_area.contains(redraw_rect2))
+
+
+def test_redraw_area_size(scroll_bg_limited):
+    """Test that redraw areas are the correct size.
+    """
+    _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+        Vector2(50, 50))
+    assert redraw_areas[0].size == (50, 800)
+    assert redraw_areas[1].size == (800, 50)
