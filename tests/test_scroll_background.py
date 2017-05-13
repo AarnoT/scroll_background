@@ -4,7 +4,7 @@
 import pytest
 import pygame as pg
 
-from scroll_background import ScrollBackground
+from scroll_background import Vector2, ScrollBackground
 
 pg.init()
 
@@ -94,3 +94,23 @@ def test_scroll_output(scroll_bg_limited):
         scroll_bg_limited.scrolling_rect)
     scroll_bg_limited.scroll((50, 50))
     assert compare_surfaces(correct_surf, scroll_bg_limited.display)
+
+
+def test_redraw_areas(scroll_bg_limited):
+    """Redraw areas should be inside scrolling_area
+    when scrolling is limited.
+    """
+    redraw_positions, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+        Vector2(50, 50))
+    redraw_rect1 = pg.Rect(redraw_positions[0], redraw_areas[0].size)
+    redraw_rect2 = pg.Rect(redraw_positions[1], redraw_areas[1].size)
+    scroll_bg_limited.scroll(50, 50)
+    assert (scroll_bg_limited.scrolling_area.contains(redraw_rect1) and
+            scroll_bg_limited.scrolling_area.contains(redraw_rect2))
+    redraw_positions, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+        Vector2(-50, -50))
+    redraw_rect1 = pg.Rect(redraw_positions[0], redraw_areas[0].size)
+    redraw_rect2 = pg.Rect(redraw_positions[1], redraw_areas[1].size)
+    scroll_bg_limited.scroll(-50, -50)
+    assert (scroll_bg_limited.scrolling_area.contains(redraw_rect1) and
+            scroll_bg_limited.scrolling_area.contains(redraw_rect2))
