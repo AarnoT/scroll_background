@@ -102,8 +102,8 @@ def test_redraw_areas(scroll_bg_limited):
     """
     redraw_positions, _ = scroll_bg_limited._calculate_redraw_areas(
         Vector2(50, 50))
-    assert redraw_positions[0] == (350, 350)
-    assert redraw_positions[1] == (350, 350)
+    assert redraw_positions[0] == (0, 500)
+    assert redraw_positions[1] == (500, 0)
     redraw_positions, _ = scroll_bg_limited._calculate_redraw_areas(
         Vector2(-50, -50))
     assert redraw_positions[0] == (250, 250)
