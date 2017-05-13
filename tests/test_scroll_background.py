@@ -11,8 +11,7 @@ pg.init()
 
 @pytest.fixture
 def scroll_bg_limited():
-    """
-    Fixture that returns a ScrollBackground instance
+    """Fixture that returns a ScrollBackground instance
     with limited_scrolling as True.
     """
     background = pg.Surface((800, 800))
@@ -23,6 +22,19 @@ def scroll_bg_limited():
                             limited_scrolling=True)
 
 
+@pytest.fixture
+def scroll_bg():
+    """Fixture that returns a ScrollBackground instance
+    with limited_scrolling as True.
+    """
+    background = pg.Surface((800, 800))
+    surf = pg.Surface((200, 200))
+    scrolling_area = (0, 0, 800, 800)
+    return ScrollBackground(background, surf, (300, 300),
+                            scrolling_area=scrolling_area,
+                            limited_scrolling=False)
+
+
 def test_limit_scrolling(scroll_bg_limited):
     """
     Test that limit_scrolling keeps display_area inside scrolling_area.
@@ -31,6 +43,15 @@ def test_limit_scrolling(scroll_bg_limited):
     assert scroll_bg_limited.display_pos == (600, 300)
     scroll_bg_limited.scroll((-800, -800))
     assert scroll_bg_limited.display_pos == (0, 0)
+
+
+def test_not_limited_scrolling(scroll_bg):
+    """Test that scrolling isn't limited
+    """
+    scroll_bg.scroll((800, 800))
+    assert scroll_bg.display_pos == (1000, 1000)
+    scroll_bg.scroll((-1200, -1200))
+    assert scroll_bg.display_pos == (-200, -200)
 
 
 def test_scroll(scroll_bg_limited):
