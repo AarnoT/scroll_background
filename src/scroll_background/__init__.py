@@ -1,6 +1,9 @@
 """Package for scrolling a surface in Pygame.
 """
 
+import functools
+import collections.abc
+
 
 class Vector2:
     """A utility class that contains an X, and a Y coordinate.
@@ -120,20 +123,33 @@ class Vector2:
         return '<Vector2(%d, %d)>'.format(self.x, self.y)
 
     @classmethod
-    def sequence2vector2(cls, func, *args, **kwargs):
+    def sequence2vector2(cls, method):
         """Decorator to convert 2-length sequence arguments to vectors.
 
         Parameters
         ----------
-        func : function or method
-            The function that will be wrapped.
+        func : method
+            The method that will be wrapped.
 
         Returns
         -------
-        wrapped_func : function
-            The wrapped function.
+        wrapper : function
+            The wrapper function.
 
         """
+        @functools.wraps(method)
+        def wrapper(self, *args, **kwargs):
+            arg_list = []
+            for arg in args:
+                if isinstance(arg, collections.abc.Sequence) and len(arg) == 2:
+                    arg_list.append(Vector2(*arg))
+                else:
+                    arg_list.append(arg)
+            if kwargs:
+                return method(self, *arg_list, **kwargs)
+            else:
+                return method(self, *arg_list)
+        return wrapper
 
 
 class ScrollBackground:
