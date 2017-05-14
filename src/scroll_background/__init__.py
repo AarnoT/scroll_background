@@ -4,6 +4,10 @@
 import functools
 import collections.abc
 
+import pygame as pg
+
+pg.init()
+
 
 class Vector2:
     """A utility class that contains an X, and a Y coordinate.
@@ -183,7 +187,11 @@ class ScrollBackground:
 
     @Vector2.sequence2vector2
     def __init__(self, background, display, display_pos):
-        pass
+        self.background = background
+        self.scaled_background = background.copy()
+        self.display = display
+        self.display_pos = display_pos
+        self._scrolling_area = pg.Rect((0, 0), background.get_size())
 
     @property
     def scrolling_area(self):
