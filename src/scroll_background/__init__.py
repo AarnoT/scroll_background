@@ -53,6 +53,7 @@ class Vector2:
         sum  : Vector2
 
         """
+        return Vector2(self.x + other.x, self.y + other.y)
 
     def __radd__(self, other):
         """Return the sum of two vectors.
@@ -66,6 +67,7 @@ class Vector2:
         sum  : Vector2
 
         """
+        return Vector2(self.x + other.x, self.y + other.y)
 
     def __sub__(self, other):
         """Return the difference of two vectors.
