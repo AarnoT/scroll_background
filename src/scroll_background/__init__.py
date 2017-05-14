@@ -81,6 +81,7 @@ class Vector2:
         difference : Vector2
 
         """
+        return Vector2(self.x - other.x, self.y - other.y)
 
     def __rsub__(self, other):
         """Return the difference of two vectors.
@@ -94,6 +95,7 @@ class Vector2:
         difference : Vector2
 
         """
+        return Vector2(other.x - self.x, other.y - self.y)
 
     def __iter__(self):
         """Iterate a vector.
