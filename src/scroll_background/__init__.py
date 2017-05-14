@@ -237,6 +237,48 @@ class ScrollBackground:
         redraw_areas : tuple of pygame.Rect
 
         """
+        area1 = None
+        area2 = None
+        if position_change.x > 0:
+            scroll_x = (self.display_pos.x +
+                        self.display.get_width() - position_change.x)
+            pos1 = scroll_x - self.display_pos.x, 0
+            area1 = pg.Rect(
+                scroll_x,
+                self.display_pos.y,
+                position_change.x,
+                self.display.get_height())
+        elif position_change.x < 0:
+            pos1 = 0, 0
+            area1 = pg.Rect(
+                self.display_pos.x,
+                self.display_pos.y,
+                position_change.x,
+                self.display.get_height())
+        if position_change.y > 0:
+            scroll_y = (self.display_pos.y +
+                        self.display.get_height() - position_change.y)
+            pos2 = 0, scroll_y - self.display_pos.y
+            area2 = pg.Rect(
+                self.display_pos.x,
+                scroll_y,
+                self.display.get_width(),
+                position_change.y)
+        elif position_change.y < 0:
+            pos2 = 0, 0
+            area2 = pg.Rect(
+                self.display_pos.x,
+                self.display_pos.y,
+                self.display.get_width(),
+                position_change.y)
+        if area1 and area2:
+            return (pos1, pos2), (area1, area2)
+        elif area1:
+            return (pos1,), (area1,)
+        elif area2:
+            return (pos2,), (area2,)
+        else:
+            return (), ()
 
     def redraw_rects(self, redraw_positions, redraw_areas):
         """Redraw the redraw areas from the background to the display.
