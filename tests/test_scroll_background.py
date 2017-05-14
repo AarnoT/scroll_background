@@ -31,18 +31,18 @@ def test_limit_scrolling(scroll_bg):
     """Test that display_area stays inside scrolling_area.
     """
     scroll_bg.scroll((500, 0))
-    assert scroll_bg.display_pos == (600, 300)
+    assert tuple(scroll_bg.display_pos) == (600, 300)
     scroll_bg.scroll((-800, -800))
-    assert scroll_bg.display_pos == (0, 0)
+    assert tuple(scroll_bg.display_pos) == (0, 0)
 
 
 def test_scroll(scroll_bg):
     """Test that display_area is moved correctly.
     """
     scroll_bg.scroll((50, 50))
-    assert scroll_bg.display_pos == (350, 350)
+    assert tuple(scroll_bg.display_pos) == (350, 350)
     scroll_bg.scroll((-50, -50))
-    assert scroll_bg.display_pos == (300, 300)
+    assert tuple(scroll_bg.display_pos) == (300, 300)
 
 
 def compare_surfaces(surface1, surface2):
@@ -62,7 +62,8 @@ def test_scroll_output(scroll_bg):
     """Test that the scroll surface looks correct after scrolling.
     """
     scroll_bg.scroll((50, 50))
-    display_area = pg.Rect(scroll_bg.display_pos, scroll_bg.display.get_size())
+    display_area = pg.Rect(tuple(scroll_bg.display_pos),
+                           scroll_bg.display.get_size())
     correct_surf = scroll_bg.scaled_background.subsurface(display_area)
     assert compare_surfaces(correct_surf, scroll_bg.display)
 
