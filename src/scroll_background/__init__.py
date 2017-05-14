@@ -238,8 +238,7 @@ class ScrollBackground:
 
         """
 
-    @staticmethod
-    def redraw_rects(cls, redraw_positions, redraw_areas):
+    def redraw_rects(self, redraw_positions, redraw_areas):
         """Redraw the redraw areas from the background to the display.
 
         Parameters
@@ -252,3 +251,5 @@ class ScrollBackground:
         None
 
         """
+        for pos, rect in zip(redraw_positions, redraw_areas):
+            self.display.blit(self.scaled_background, tuple(pos), rect)
