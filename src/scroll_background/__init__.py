@@ -192,6 +192,8 @@ class ScrollBackground:
         self.display = display
         self.display_pos = display_pos
         self._scrolling_area = pg.Rect((0, 0), background.get_size())
+        if not self._scrolling_area.contains(((0, 0), display.get_size())):
+            raise ValueError('Background can\'t contain display.')
 
     @property
     def scrolling_area(self):
