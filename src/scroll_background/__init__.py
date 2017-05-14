@@ -106,6 +106,8 @@ class Vector2:
         y : int
 
         """
+        yield self.x
+        yield self.y
 
     def __repr__(self):
         """Return the string representation of a vector.
