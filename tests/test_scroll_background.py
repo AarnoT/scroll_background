@@ -10,29 +10,12 @@ pg.init()
 
 
 @pytest.fixture
-def scroll_bg_limited():
-    """Fixture that returns a ScrollBackground instance
-    with limited_scrolling as True.
-    """
-    background = pg.Surface((800, 800))
-    surf = pg.Surface((200, 200))
-    scrolling_area = (0, 0, 800, 800)
-    return ScrollBackground(background, surf, (300, 300),
-                            scrolling_area=scrolling_area,
-                            limited_scrolling=True)
-
-
-@pytest.fixture
 def scroll_bg():
-    """Fixture that returns a ScrollBackground instance
-    with limited_scrolling as False.
+    """Fixture that returns a ScrollBackground instance.
     """
     background = pg.Surface((800, 800))
     surf = pg.Surface((200, 200))
-    scrolling_area = pg.Rect(0, 0, 800, 800)
-    return ScrollBackground(background, surf, (300, 300),
-                            scrolling_area=scrolling_area,
-                            limited_scrolling=False)
+    return ScrollBackground(background, surf, (300, 300))
 
 
 def test_too_small_scrolling_area():
@@ -41,37 +24,25 @@ def test_too_small_scrolling_area():
     background = pg.Surface((400, 400))
     surf = pg.Surface((800, 800))
     with pytest.raises(ValueError):
-        ScrollBackground(background, surf, (0, 0),
-                         scrolling_area=(0, 0, 400, 400),
-                         limited_scrolling=True)
+        ScrollBackground(background, surf, (0, 0))
 
 
-def test_limit_scrolling(scroll_bg_limited):
+def test_limit_scrolling(scroll_bg):
+    """Test that display_area stays inside scrolling_area.
     """
-    Test that limit_scrolling keeps display_area inside scrolling_area.
-    """
-    scroll_bg_limited.scroll((500, 0))
-    assert scroll_bg_limited.display_pos == (600, 300)
-    scroll_bg_limited.scroll((-800, -800))
-    assert scroll_bg_limited.display_pos == (0, 0)
+    scroll_bg.scroll((500, 0))
+    assert scroll_bg.display_pos == (600, 300)
+    scroll_bg.scroll((-800, -800))
+    assert scroll_bg.display_pos == (0, 0)
 
 
-def test_not_limited_scrolling(scroll_bg):
-    """Test that scrolling isn't limited
-    """
-    scroll_bg.scroll((700, 700))
-    assert scroll_bg.display_pos == (1000, 1000)
-    scroll_bg.scroll((-1200, -1200))
-    assert scroll_bg.display_pos == (-200, -200)
-
-
-def test_scroll(scroll_bg_limited):
+def test_scroll(scroll_bg):
     """Test that display_area is moved correctly.
     """
-    scroll_bg_limited.scroll((50, 50))
-    assert scroll_bg_limited.scrolling_pos == (350, 350)
-    scroll_bg_limited.scroll((-50, -50))
-    assert scroll_bg_limited.scrolling_pos == (300, 300)
+    scroll_bg.scroll((50, 50))
+    assert scroll_bg.display_pos == (350, 350)
+    scroll_bg.scroll((-50, -50))
+    assert scroll_bg.display_pos == (300, 300)
 
 
 def compare_surfaces(surface1, surface2):
@@ -87,37 +58,36 @@ def compare_surfaces(surface1, surface2):
     return mask1.count() == mask2.count() == 0
 
 
-def test_scroll_output(scroll_bg_limited):
+def test_scroll_output(scroll_bg):
     """Test that the scroll surface looks correct after scrolling.
     """
-    correct_surf = scroll_bg_limited.background.subsurface(
-        scroll_bg_limited.scrolling_rect)
-    scroll_bg_limited.scroll((50, 50))
-    assert compare_surfaces(correct_surf, scroll_bg_limited.display)
+    scroll_bg.scroll((50, 50))
+    display_area = pg.Rect(scroll_bg.display_pos, scroll_bg.display.get_size())
+    correct_surf = scroll_bg.scaled_background.subsurface(display_area)
+    assert compare_surfaces(correct_surf, scroll_bg.display)
 
 
-def test_redraw_areas(scroll_bg_limited):
-    """Redraw areas should be inside scrolling_area
-    when scrolling is limited.
+def test_redraw_areas(scroll_bg):
+    """Redraw areas should be inside scrolling_area.
     """
-    redraw_positions, _ = scroll_bg_limited._calculate_redraw_areas(
+    redraw_positions, _ = scroll_bg._calculate_redraw_areas(
         Vector2(50, 50))
     assert redraw_positions[0] == (0, 500)
     assert redraw_positions[1] == (500, 0)
-    redraw_positions, _ = scroll_bg_limited._calculate_redraw_areas(
+    redraw_positions, _ = scroll_bg._calculate_redraw_areas(
         Vector2(-50, -50))
     assert redraw_positions[0] == (250, 250)
     assert redraw_positions[1] == (250, 250)
 
 
-def test_redraw_area_size(scroll_bg_limited):
+def test_redraw_area_size(scroll_bg):
     """Test that redraw areas are the correct size.
     """
-    _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+    _, redraw_areas = scroll_bg._calculate_redraw_areas(
         Vector2(50, 50))
     assert redraw_areas[0].size == (50, 200)
     assert redraw_areas[1].size == (200, 50)
-    _, redraw_areas = scroll_bg_limited._calculate_redraw_areas(
+    _, redraw_areas = scroll_bg._calculate_redraw_areas(
         Vector2(-50, -50))
     assert redraw_areas[0].size == (50, 200)
     assert redraw_areas[1].size == (200, 50)
