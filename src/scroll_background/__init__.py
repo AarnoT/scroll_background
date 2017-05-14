@@ -207,6 +207,19 @@ class ScrollBackground:
         return self._scrolling_area.copy()
 
     @Vector2.sequence2vector2
+    def center(self, point):
+        """Center the display on a point.
+
+        Parameters
+        ----------
+        point : Vector2
+
+        """
+        new_display_pos = Vector2(point.x - self.display.get_width()/2,
+                                  point.y - self.display.get_height()/2)
+        self.scroll(self.display_pos - new_display_pos)
+
+    @Vector2.sequence2vector2
     def scroll(self, position_change):
         """Scroll the display by position_change
 
@@ -265,7 +278,7 @@ class ScrollBackground:
             area1 = pg.Rect(
                 self.display_pos.x,
                 self.display_pos.y,
-                position_change.x,
+                -position_change.x,
                 self.display.get_height())
         if position_change.y > 0:
             scroll_y = (self.display_pos.y +
@@ -282,7 +295,7 @@ class ScrollBackground:
                 self.display_pos.x,
                 self.display_pos.y,
                 self.display.get_width(),
-                position_change.y)
+                -position_change.y)
         if area1 and area2:
             return (pos1, pos2), (area1, area2)
         elif area1:
