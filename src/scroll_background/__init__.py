@@ -189,11 +189,17 @@ class ScrollBackground:
 
     Attributes
     ----------
-    original_background : pygame.Surface
+    background
+    display
+    display_pos
+    true_pos
+    scrolling_area
+
+    _original_background : pygame.Surface
         Copy of the original background surface.
-    background : pygame.Surface
+    _background : pygame.Surface
         Copy of the background used for zooming.
-    display : pygame.Surface
+    _display : pygame.Surface
         The display surface.
     _display_pos : Vector2
         Position of the display relative to the background.
@@ -212,14 +218,73 @@ class ScrollBackground:
 
     @Vector2.sequence2vector2
     def __init__(self, background, display, display_pos):
-        self.original_background = background.copy()
-        self.background = background.copy()
-        self.display = display
+        self._original_background = background.copy()
+        self._display = display
         self._display_pos = Vector2(*(int(coord) for coord in display_pos))
         self._true_pos = display_pos
-        self._scrolling_area = pg.Rect((0, 0), background.get_size())
-        if not self._scrolling_area.contains(((0, 0), display.get_size())):
+        # Setter sets self._scrolling_area and self._background.
+        self.background = background.copy()
+
+    @property
+    def background(self):
+        """Return the background.
+
+        Returns
+        -------
+        pygame.Surface
+
+        """
+        return self._background
+
+    @background.setter
+    def background(self, value):
+        """Set the background to value.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If the background can't contain the display.
+
+        """
+        self._scrolling_area = pg.Rect((0, 0), value.get_size())
+        if not self._scrolling_area.contains(
+                ((0, 0), self._display.get_size())):
             raise ValueError('Background can\'t contain display.')
+        self._background = value
+
+    @property
+    def display(self):
+        """Return the display.
+
+        Returns
+        -------
+        pygame.Surface
+
+        """
+        return self._display
+
+    @display.setter
+    def display(self, value):
+        """Set the display to value.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If the background can't contain the display.
+
+        """
+        if not self._scrolling_area.contains(
+                ((0, 0), self.value.get_size())):
+            raise ValueError('Background can\'t contain display.')
+        self._display = value
 
     @property
     def display_pos(self):
