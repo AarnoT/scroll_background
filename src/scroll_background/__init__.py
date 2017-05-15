@@ -1,6 +1,7 @@
 """Package for scrolling a surface in Pygame.
 """
 
+import math
 import functools
 import collections.abc
 
@@ -47,6 +48,16 @@ class Vector2:
     def __init__(self, x, y):
         self.x = float(x)
         self.y = float(y)
+
+    @property
+    def length(self):
+        """The length of the vector.
+
+        Returns
+        -------
+        length : float
+        """
+        return math.hypot(self.x, self.y)
 
     def __add__(self, other):
         """Return the sum of two vectors.
@@ -221,7 +232,8 @@ class ScrollBackground:
         """
         new_display_pos = Vector2(point.x - self.display.get_width()/2,
                                   point.y - self.display.get_height()/2)
-        self.scroll(new_display_pos - self.display_pos)
+        if (new_display_pos - self.true_pos).length >= 1:
+            self.scroll(new_display_pos - self.display_pos)
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
