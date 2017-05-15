@@ -92,3 +92,13 @@ def test_redraw_area_size(scroll_bg):
         Vector2(-50, -50))
     assert redraw_areas[0].size == (50, 200)
     assert redraw_areas[1].size == (200, 50)
+
+def test_no_drift(scroll_bg):
+    """Test that scroll_bg doesn't drift when centered.
+    """
+    center_pos = 123.5649437027, 182.2849278591
+    scroll_bg.center(center_pos)
+    pos1 = tuple(scroll_bg.display_pos)
+    for n in range(30):
+        scroll_bg.center(center_pos)
+    assert pos1 == tuple(scroll_bg.display_pos)
