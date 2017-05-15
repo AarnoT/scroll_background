@@ -243,7 +243,7 @@ class ScrollBackground:
             display_rect.clamp_ip(self.scrolling_area)
             self.display_pos = Vector2(*display_rect.topleft)
             position_change = self.display_pos - prev_pos
-        self.display.scroll(position_change.x, position_change.y)
+        self.display.scroll(-position_change.x, -position_change.y)
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
 
     @Vector2.sequence2vector2
