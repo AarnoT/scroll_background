@@ -217,7 +217,7 @@ class ScrollBackground:
         """
         new_display_pos = Vector2(point.x - self.display.get_width()/2,
                                   point.y - self.display.get_height()/2)
-        self.scroll(self.display_pos - new_display_pos)
+        self.scroll(new_display_pos - self.display_pos)
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
