@@ -64,7 +64,7 @@ def test_scroll_output(scroll_bg):
     scroll_bg.scroll((50, 50))
     display_area = pg.Rect(tuple(scroll_bg.display_pos),
                            scroll_bg.display.get_size())
-    correct_surf = scroll_bg.scaled_background.subsurface(display_area)
+    correct_surf = scroll_bg.background.subsurface(display_area)
     assert compare_surfaces(correct_surf, scroll_bg.display)
 
 
@@ -92,6 +92,7 @@ def test_redraw_area_size(scroll_bg):
         Vector2(-50, -50))
     assert redraw_areas[0].size == (50, 200)
     assert redraw_areas[1].size == (200, 50)
+
 
 def test_no_drift(scroll_bg):
     """Test that scroll_bg doesn't drift when centered.
