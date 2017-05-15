@@ -18,12 +18,12 @@ class Vector2:
 
     Parameters
     ----------
-    x, y : int
+    x, y : float
         The X and Y coordinates.
 
     Attributes
     ----------
-    x, y : int
+    x, y : float
         The X and Y coordinates.
 
     Examples
@@ -45,8 +45,8 @@ class Vector2:
     """
 
     def __init__(self, x, y):
-        self.x = int(x)
-        self.y = int(y)
+        self.x = float(x)
+        self.y = float(y)
 
     def __add__(self, other):
         """Return the sum of two vectors.
@@ -109,8 +109,8 @@ class Vector2:
 
         Yields
         ------
-        x : int
-        y : int
+        x : float
+        y : float
 
         """
         yield self.x
@@ -175,6 +175,9 @@ class ScrollBackground:
         The display surface.
     display_pos : Vector2
         Position of the display relative to the background.
+        Only contains integers in float format.
+    true_pos : Vector2
+        More precise position.
     _scrolling_area : pygame.Rect
         The area that limits scrolling.
 
@@ -190,7 +193,8 @@ class ScrollBackground:
         self.background = background
         self.scaled_background = background.copy()
         self.display = display
-        self.display_pos = display_pos
+        self.display_pos = Vector2(*(int(coord) for coord in display_pos))
+        self.true_pos = display_pos
         self._scrolling_area = pg.Rect((0, 0), background.get_size())
         if not self._scrolling_area.contains(((0, 0), display.get_size())):
             raise ValueError('Background can\'t contain display.')
@@ -236,14 +240,16 @@ class ScrollBackground:
 
         """
         prev_pos = self.display_pos
-        self.display_pos = self.display_pos + position_change
+        self.true_pos += position_change
+        self.display_pos = Vector2(*(int(coord) for coord in self.true_pos))
         display_rect = pg.Rect(tuple(self.display_pos), self.display.get_size())
         if not self.scrolling_area.contains(display_rect):
             # Move display inside scrolling_area
             display_rect.clamp_ip(self.scrolling_area)
             self.display_pos = Vector2(*display_rect.topleft)
-            position_change = self.display_pos - prev_pos
-        self.display.scroll(-position_change.x, -position_change.y)
+            self.true_pos = Vector2(*display_rect.topleft)
+        position_change = self.display_pos - prev_pos
+        self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
 
     @Vector2.sequence2vector2
