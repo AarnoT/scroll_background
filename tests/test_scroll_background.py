@@ -61,6 +61,25 @@ def compare_surfaces(surface1, surface2):
 def test_scroll_output(scroll_bg):
     """Test that the scroll surface looks correct after scrolling.
     """
+    # Draw a grid.
+    for x in range(0, 800, 50):
+        for y in range(0, 800, 50):
+            pg.draw.rect(
+                scroll_bg.background, (0, 255, 0), (x, y, 50, 50))
+    for x in range(0, 800, 100):
+        for y in range(50, 800, 100):
+            pg.draw.rect(
+                scroll_bg.background, (0, 0, 255), (x, y, 50, 50))
+    for x in range(50, 800, 100):
+        for y in range(0, 800, 100):
+            pg.draw.rect(
+                scroll_bg.background, (0, 0, 255), (x, y, 50, 50))
+    scroll_bg.display.blit(
+            scroll_bg.background,
+            (0, 0),
+            pg.Rect(tuple(scroll_bg.display_pos),
+                    scroll_bg.display.get_size()))
+
     scroll_bg.scroll((50, 50))
     display_area = pg.Rect(tuple(scroll_bg.display_pos),
                            scroll_bg.display.get_size())
