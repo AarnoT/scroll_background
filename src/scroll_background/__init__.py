@@ -13,9 +13,9 @@ pg.init()
 class Vector2:
     """A utility class that contains an X, and a Y coordinate.
 
-    Two vectors can be added or substracted together.
-    `Vector2` also implements the __iter__ method, which makes
-    `Vector2` instances easy to convert to another iterable.
+    Two vectors can be added or substracted together. `Vector2` also
+    implements the __iter__ method, which makes `Vector2` instances
+    easy to convert to another iterable.
 
     Parameters
     ----------
@@ -24,6 +24,7 @@ class Vector2:
 
     Attributes
     ----------
+    length
     x, y : float
         The X and Y coordinates.
 
@@ -197,9 +198,8 @@ class ScrollBackground:
     zoom
 
     _original_background : pygame.Surface
-        Copy of the original background surface.
-        You need to draw to it before creating a `ScrollBackground`,
-        because it's a copy.
+        Copy of the original background surface. You need to draw to
+        it before creating a `ScrollBackground`, because it's a copy.
     _background : pygame.Surface
         Copy of the background used for zooming.
     _display : pygame.Surface
