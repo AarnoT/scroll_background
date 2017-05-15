@@ -124,7 +124,7 @@ class Vector2:
         repr : str
 
         """
-        return '<Vector2(%d, %d)>'.format(self.x, self.y)
+        return '<Vector2({}, {})>'.format(self.x, self.y)
 
     @classmethod
     def sequence2vector2(cls, method):
