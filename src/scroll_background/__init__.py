@@ -194,9 +194,12 @@ class ScrollBackground:
     display_pos
     true_pos
     scrolling_area
+    zoom
 
     _original_background : pygame.Surface
         Copy of the original background surface.
+        You need to draw to it before creating a `ScrollBackground`,
+        because it's a copy.
     _background : pygame.Surface
         Copy of the background used for zooming.
     _display : pygame.Surface
@@ -208,6 +211,8 @@ class ScrollBackground:
         More precise position.
     _scrolling_area : pygame.Rect
         The area that limits scrolling.
+    _zoom : float
+        The factor by which the background is zoomed.
 
     Raises
     ------
@@ -224,6 +229,7 @@ class ScrollBackground:
         self._true_pos = display_pos
         # Setter sets self._scrolling_area and self._background.
         self.background = background.copy()
+        self._zoom = 1.0
 
     @property
     def background(self):
@@ -352,6 +358,39 @@ class ScrollBackground:
 
         """
         return self._scrolling_area.copy()
+
+        self._zoom = 1.0
+
+    @property
+    def zoom(self):
+        """Return the zoom factor.
+
+        Returns
+        -------
+        zoom : float
+        """
+        return self._zoom
+
+    @zoom.setter
+    def zoom(self, scale):
+        """Create a new zoomed background and scale variables.
+
+        Parameters
+        ----------
+        scale : float
+
+        Returns
+        -------
+        None
+        """
+        # Using setter.
+        self.background = pg.transform.scale(self._original_background, tuple(
+            int(size*scale) for size in self._original_background.get_size()))
+        self._display_pos = Vector2(
+           *(int(coord*scale) for coord in self._true_pos))
+        self._true_pos = Vector2(*(coord*scale for coord in self._true_pos))
+        self._display.blit(self._background, (0, 0),
+                           (tuple(self._display_pos), self._display.get_size()))
 
     @Vector2.sequence2vector2
     def center(self, point):
