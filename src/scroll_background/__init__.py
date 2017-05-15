@@ -56,8 +56,19 @@ class Vector2:
         Returns
         -------
         length : float
+
         """
         return math.hypot(self.x, self.y)
+
+    def copy(self):
+        """Return a copy of the vector.
+
+        Returns
+        -------
+        copy : Vector2
+
+        """
+        return Vector2(self.x, self.y)
 
     def __add__(self, other):
         """Return the sum of two vectors.
@@ -184,10 +195,10 @@ class ScrollBackground:
         Scaled version of the background.
     display : pygame.Surface
         The display surface.
-    display_pos : Vector2
+    _display_pos : Vector2
         Position of the display relative to the background.
         Only contains integers in float format.
-    true_pos : Vector2
+    _true_pos : Vector2
         More precise position.
     _scrolling_area : pygame.Rect
         The area that limits scrolling.
@@ -204,11 +215,67 @@ class ScrollBackground:
         self.background = background
         self.scaled_background = background.copy()
         self.display = display
-        self.display_pos = Vector2(*(int(coord) for coord in display_pos))
-        self.true_pos = display_pos
+        self._display_pos = Vector2(*(int(coord) for coord in display_pos))
+        self._true_pos = display_pos
         self._scrolling_area = pg.Rect((0, 0), background.get_size())
         if not self._scrolling_area.contains(((0, 0), display.get_size())):
             raise ValueError('Background can\'t contain display.')
+
+    @property
+    def display_pos(self):
+        """Return a copy of _display_pos.
+
+        Returns
+        -------
+        Vector2
+
+        """
+        return self._display_pos.copy()
+
+    @display_pos.setter
+    @Vector2.sequence2vector2
+    def display_pos(self, value):
+        """Set _display_pos and _true_pos to copies of value.
+
+        Parameters
+        ----------
+        value : Vector2
+
+        Returns
+        -------
+        None
+
+        """
+        self._display_pos = value.copy()
+        self._true_pos = value.copy()
+
+    @property
+    def true_pos(self):
+        """Return a copy of _true_pos.
+
+        Returns
+        -------
+        Vector2
+
+        """
+        return self._true_pos.copy()
+
+    @true_pos.setter
+    @Vector2.sequence2vector2
+    def true_pos(self, value):
+        """Set _display_pos and _true_pos to copies of value.
+
+        Parameters
+        ----------
+        value : Vector2
+
+        Returns
+        -------
+        None
+
+        """
+        self._display_pos = value.copy()
+        self._true_pos = value.copy()
 
     @property
     def scrolling_area(self):
@@ -251,15 +318,16 @@ class ScrollBackground:
         None
 
         """
-        prev_pos = self.display_pos
-        self.true_pos += position_change
-        self.display_pos = Vector2(*(int(coord) for coord in self.true_pos))
-        display_rect = pg.Rect(tuple(self.display_pos), self.display.get_size())
+        prev_pos = self._display_pos
+        self._true_pos += position_change
+        self._display_pos = Vector2(*(int(coord) for coord in self._true_pos))
+        display_rect = pg.Rect(
+            tuple(self._display_pos), self.display.get_size())
         if not self.scrolling_area.contains(display_rect):
             # Move display inside scrolling_area
             display_rect.clamp_ip(self.scrolling_area)
-            self.display_pos = Vector2(*display_rect.topleft)
-            self.true_pos = Vector2(*display_rect.topleft)
+            self._display_pos = Vector2(*display_rect.topleft)
+            self._true_pos = Vector2(*display_rect.topleft)
         position_change = self.display_pos - prev_pos
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
@@ -283,35 +351,35 @@ class ScrollBackground:
         area1 = None
         area2 = None
         if position_change.x > 0:
-            scroll_x = (self.display_pos.x +
+            scroll_x = (self._display_pos.x +
                         self.display.get_width() - position_change.x)
-            pos1 = scroll_x - self.display_pos.x, 0
+            pos1 = scroll_x - self._display_pos.x, 0
             area1 = pg.Rect(
                 scroll_x,
-                self.display_pos.y,
+                self._display_pos.y,
                 position_change.x,
                 self.display.get_height())
         elif position_change.x < 0:
             pos1 = 0, 0
             area1 = pg.Rect(
-                self.display_pos.x,
-                self.display_pos.y,
+                self._display_pos.x,
+                self._display_pos.y,
                 -position_change.x,
                 self.display.get_height())
         if position_change.y > 0:
-            scroll_y = (self.display_pos.y +
+            scroll_y = (self._display_pos.y +
                         self.display.get_height() - position_change.y)
             pos2 = 0, scroll_y - self.display_pos.y
             area2 = pg.Rect(
-                self.display_pos.x,
+                self._display_pos.x,
                 scroll_y,
                 self.display.get_width(),
                 position_change.y)
         elif position_change.y < 0:
             pos2 = 0, 0
             area2 = pg.Rect(
-                self.display_pos.x,
-                self.display_pos.y,
+                self._display_pos.x,
+                self._display_pos.y,
                 self.display.get_width(),
                 -position_change.y)
         if area1 and area2:
