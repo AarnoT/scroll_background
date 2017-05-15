@@ -189,10 +189,10 @@ class ScrollBackground:
 
     Attributes
     ----------
+    original_background : pygame.Surface
+        Copy of the original background surface.
     background : pygame.Surface
-        The original background surface.
-    scaled_background : pygame.Surface
-        Scaled version of the background.
+        Copy of the background used for zooming.
     display : pygame.Surface
         The display surface.
     _display_pos : Vector2
@@ -212,8 +212,8 @@ class ScrollBackground:
 
     @Vector2.sequence2vector2
     def __init__(self, background, display, display_pos):
-        self.background = background
-        self.scaled_background = background.copy()
+        self.original_background = background.copy()
+        self.background = background.copy()
         self.display = display
         self._display_pos = Vector2(*(int(coord) for coord in display_pos))
         self._true_pos = display_pos
@@ -405,4 +405,4 @@ class ScrollBackground:
 
         """
         for pos, rect in zip(redraw_positions, redraw_areas):
-            self.display.blit(self.scaled_background, tuple(pos), rect)
+            self.display.blit(self.background, tuple(pos), rect)
