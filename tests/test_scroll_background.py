@@ -18,15 +18,6 @@ def scroll_bg():
     return ScrollBackground(background, surf, (300, 300))
 
 
-def test_too_small_scrolling_area():
-    """A ValueError should be raised if scrolling_area us too small.
-    """
-    background = pg.Surface((400, 400))
-    surf = pg.Surface((800, 800))
-    with pytest.raises(ValueError):
-        ScrollBackground(background, surf, (0, 0))
-
-
 def test_limit_scrolling(scroll_bg):
     """Test that display_area stays inside scrolling_area.
     """
