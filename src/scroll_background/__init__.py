@@ -225,7 +225,7 @@ class ScrollBackground:
     def __init__(self, background, display, display_pos):
         self._original_background = background.copy()
         self._display = display
-        self._display_pos = Vector2(*(int(coord) for coord in display_pos))
+        self._display_pos = Vector2(*map(int, display_pos))
         self._true_pos = display_pos
         # Setter sets self._scrolling_area and self._background.
         self.background = background.copy()
@@ -383,13 +383,24 @@ class ScrollBackground:
         -------
         None
         """
-        # Using setter.
-        self.background = pg.transform.scale(self._original_background, tuple(
+        self._background = pg.transform.scale(self._original_background, tuple(
             int(size*scale) for size in self._original_background.get_size()))
-        self._display_pos = Vector2(
-           *(int(coord*scale) for coord in self._true_pos))
+        # Needed in case background is smaller than display.
+        background_pos = (
+            max(int(self._display.get_width() -
+                    self._background.get_width())//2, 0),
+            max(int(self._display.get_height() -
+                    self._background.get_height())//2, 0))
+        self._scrolling_area = pg.Rect(
+            background_pos, self._background.get_size())
         self._true_pos = Vector2(*(coord*scale for coord in self._true_pos))
-        self._display.blit(self._background, (0, 0),
+        display_rect = pg.Rect(
+            tuple(self._true_pos), self.display.get_size())
+        display_rect.clamp_ip(self._scrolling_area)
+        self._true_pos = Vector2(*display_rect.topleft)
+        self._display_pos = Vector2(*map(int, self._true_pos))
+        self._display.fill((0, 0, 0))
+        self._display.blit(self._background, background_pos,
                            (tuple(self._display_pos), self._display.get_size()))
 
     @Vector2.sequence2vector2
@@ -424,6 +435,7 @@ class ScrollBackground:
         """
         prev_pos = self._display_pos
         self._true_pos += position_change
+        self._display_pos = Vector2(*map(int, self._true_pos))
         self._display_pos = Vector2(*(int(coord) for coord in self._true_pos))
         display_rect = pg.Rect(
             tuple(self._display_pos), self.display.get_size())
@@ -509,4 +521,6 @@ class ScrollBackground:
 
         """
         for pos, rect in zip(redraw_positions, redraw_areas):
+            pos = (coord + offset for coord, offset
+                   in zip(pos, self._scrolling_area.topleft))
             self.display.blit(self.background, tuple(pos), rect)
