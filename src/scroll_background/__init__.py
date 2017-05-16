@@ -245,8 +245,15 @@ class ScrollBackground:
         None
 
         """
-        self._scrolling_area = pg.Rect((0, 0), value.get_size())
         self._background = value
+        # Needed in case background is smaller than display.
+        background_pos = (
+            max(int(self.display.get_width() -
+                    self._background.get_width())//2, 0),
+            max(int(self.display.get_height() -
+                    self._background.get_height())//2, 0))
+        self._scrolling_area = pg.Rect(
+            background_pos, self._background.get_size())
 
     @property
     def display_pos(self):
@@ -339,21 +346,14 @@ class ScrollBackground:
         -------
         None
         """
-        self._background = pg.transform.scale(self._original_background, tuple(
+        # Using setter.
+        self.background = pg.transform.scale(self._original_background, tuple(
             int(size*scale) for size in self._original_background.get_size()))
-        # Needed in case background is smaller than display.
-        background_pos = (
-            max(int(self.display.get_width() -
-                    self._background.get_width())//2, 0),
-            max(int(self.display.get_height() -
-                    self._background.get_height())//2, 0))
-        self._scrolling_area = pg.Rect(
-            background_pos, self._background.get_size())
         self._true_pos = Vector2(*(coord*scale for coord in self._true_pos))
-        display_rect = pg.Rect(
-            tuple(self._true_pos), self.display.get_size())
+        display_rect = pg.Rect(tuple(self._true_pos), self.display.get_size())
         display_rect.clamp_ip(self._scrolling_area)
-        self._true_pos = Vector2(*display_rect.topleft)
+        if (display_rect.topleft != tuple(map(int, self_true_pos))):
+            self._true_pos = Vector2(*display_rect.topleft)
         self._display_pos = Vector2(*map(int, self._true_pos))
         self.display.fill((0, 0, 0))
         self.display.blit(self._background, background_pos,
