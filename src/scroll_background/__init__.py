@@ -186,13 +186,12 @@ class ScrollBackground:
     ----------
     background : pygame.Surface
     display : pygame.Surface
-    display_pos : Vector2
+    _display_pos : Vector2
 
     Attributes
     ----------
     background
-    display
-    display_pos
+    _display_pos
     true_pos
     scrolling_area
     zoom
@@ -202,7 +201,7 @@ class ScrollBackground:
         it before creating a `ScrollBackground`, because it's a copy.
     _background : pygame.Surface
         Copy of the background used for zooming.
-    _display : pygame.Surface
+    display : pygame.Surface
         The display surface.
     _display_pos : Vector2
         Position of the display relative to the background.
@@ -214,19 +213,14 @@ class ScrollBackground:
     _zoom : float
         The factor by which the background is zoomed.
 
-    Raises
-    ------
-    ValueError
-        If the background can't contain the display.
-
     """
 
     @Vector2.sequence2vector2
-    def __init__(self, background, display, display_pos):
+    def __init__(self, background, display, _display_pos):
         self._original_background = background.copy()
-        self._display = display
-        self._display_pos = Vector2(*map(int, display_pos))
-        self._true_pos = display_pos
+        self.display = display
+        self._display_pos = Vector2(*map(int, _display_pos))
+        self._true_pos = _display_pos
         # Setter sets self._scrolling_area and self._background.
         self.background = background.copy()
         self._zoom = 1.0
@@ -250,47 +244,9 @@ class ScrollBackground:
         -------
         None
 
-        Raises
-        ------
-        ValueError
-            If the background can't contain the display.
-
         """
         self._scrolling_area = pg.Rect((0, 0), value.get_size())
-        if not self._scrolling_area.contains(
-                ((0, 0), self._display.get_size())):
-            raise ValueError('Background can\'t contain display.')
         self._background = value
-
-    @property
-    def display(self):
-        """Return the display.
-
-        Returns
-        -------
-        pygame.Surface
-
-        """
-        return self._display
-
-    @display.setter
-    def display(self, value):
-        """Set the display to value.
-
-        Returns
-        -------
-        None
-
-        Raises
-        ------
-        ValueError
-            If the background can't contain the display.
-
-        """
-        if not self._scrolling_area.contains(
-                ((0, 0), self.value.get_size())):
-            raise ValueError('Background can\'t contain display.')
-        self._display = value
 
     @property
     def display_pos(self):
@@ -387,9 +343,9 @@ class ScrollBackground:
             int(size*scale) for size in self._original_background.get_size()))
         # Needed in case background is smaller than display.
         background_pos = (
-            max(int(self._display.get_width() -
+            max(int(self.display.get_width() -
                     self._background.get_width())//2, 0),
-            max(int(self._display.get_height() -
+            max(int(self.display.get_height() -
                     self._background.get_height())//2, 0))
         self._scrolling_area = pg.Rect(
             background_pos, self._background.get_size())
@@ -399,9 +355,9 @@ class ScrollBackground:
         display_rect.clamp_ip(self._scrolling_area)
         self._true_pos = Vector2(*display_rect.topleft)
         self._display_pos = Vector2(*map(int, self._true_pos))
-        self._display.fill((0, 0, 0))
-        self._display.blit(self._background, background_pos,
-                           (tuple(self._display_pos), self._display.get_size()))
+        self.display.fill((0, 0, 0))
+        self.display.blit(self._background, background_pos,
+                           (tuple(self._display_pos), self.display.get_size()))
 
     @Vector2.sequence2vector2
     def center(self, point):
@@ -415,7 +371,7 @@ class ScrollBackground:
         new_display_pos = Vector2(point.x - self.display.get_width()/2,
                                   point.y - self.display.get_height()/2)
         if (new_display_pos - self.true_pos).length >= 1:
-            self.scroll(new_display_pos - self.display_pos)
+            self.scroll(new_display_pos - self._display_pos)
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
@@ -444,7 +400,7 @@ class ScrollBackground:
             display_rect.clamp_ip(self.scrolling_area)
             self._display_pos = Vector2(*display_rect.topleft)
             self._true_pos = Vector2(*display_rect.topleft)
-        position_change = self.display_pos - prev_pos
+        position_change = self._display_pos - prev_pos
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
 
@@ -485,7 +441,7 @@ class ScrollBackground:
         if position_change.y > 0:
             scroll_y = (self._display_pos.y +
                         self.display.get_height() - position_change.y)
-            pos2 = 0, scroll_y - self.display_pos.y
+            pos2 = 0, scroll_y - self._display_pos.y
             area2 = pg.Rect(
                 self._display_pos.x,
                 scroll_y,
