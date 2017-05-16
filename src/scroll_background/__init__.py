@@ -186,13 +186,12 @@ class ScrollBackground:
     ----------
     background : pygame.Surface
     display : pygame.Surface
-    _display_pos : Vector2
+    display_pos : Vector2
 
     Attributes
     ----------
     background
-    _display_pos
-    true_pos
+    display_pos
     scrolling_area
     zoom
 
@@ -203,11 +202,8 @@ class ScrollBackground:
         Copy of the background used for zooming.
     display : pygame.Surface
         The display surface.
-    _display_pos : Vector2
-        Position of the display relative to the background.
-        Only contains integers in float format.
-    _true_pos : Vector2
-        More precise position.
+    true_pos : Vector2
+        Accurate display position.
     _scrolling_area : pygame.Rect
         The area that limits scrolling.
     _zoom : float
@@ -216,11 +212,10 @@ class ScrollBackground:
     """
 
     @Vector2.sequence2vector2
-    def __init__(self, background, display, _display_pos):
+    def __init__(self, background, display, display_pos):
         self._original_background = background.copy()
         self.display = display
-        self._display_pos = Vector2(*map(int, _display_pos))
-        self._true_pos = _display_pos
+        self.true_pos = display_pos
         # Setter sets self._scrolling_area and self._background.
         self.background = background.copy()
         self._zoom = 1.0
@@ -249,27 +244,27 @@ class ScrollBackground:
         # Needed in case background is smaller than display.
         background_pos = (
             max(int(self.display.get_width() -
-                    self._background.get_width())//2, 0),
+                    self.background.get_width())//2, 0),
             max(int(self.display.get_height() -
-                    self._background.get_height())//2, 0))
+                    self.background.get_height())//2, 0))
         self._scrolling_area = pg.Rect(
-            background_pos, self._background.get_size())
+            background_pos, self.background.get_size())
 
     @property
     def display_pos(self):
-        """Return a copy of _display_pos.
+        """Return true_pos mapped to integer values.
 
         Returns
         -------
         Vector2
 
         """
-        return self._display_pos.copy()
+        return Vector2(*map(int, self.true_pos))
 
     @display_pos.setter
     @Vector2.sequence2vector2
     def display_pos(self, value):
-        """Set _display_pos and _true_pos to copies of value.
+        """Set true_pos to value.
 
         Parameters
         ----------
@@ -280,36 +275,7 @@ class ScrollBackground:
         None
 
         """
-        self._display_pos = value.copy()
-        self._true_pos = value.copy()
-
-    @property
-    def true_pos(self):
-        """Return a copy of _true_pos.
-
-        Returns
-        -------
-        Vector2
-
-        """
-        return self._true_pos.copy()
-
-    @true_pos.setter
-    @Vector2.sequence2vector2
-    def true_pos(self, value):
-        """Set _display_pos and _true_pos to copies of value.
-
-        Parameters
-        ----------
-        value : Vector2
-
-        Returns
-        -------
-        None
-
-        """
-        self._display_pos = value.copy()
-        self._true_pos = value.copy()
+        self.true_pos = value
 
     @property
     def scrolling_area(self):
@@ -322,8 +288,6 @@ class ScrollBackground:
         """
         return self._scrolling_area.copy()
 
-        self._zoom = 1.0
-
     @property
     def zoom(self):
         """Return the zoom factor.
@@ -331,6 +295,7 @@ class ScrollBackground:
         Returns
         -------
         zoom : float
+
         """
         return self._zoom
 
@@ -350,15 +315,14 @@ class ScrollBackground:
         # Using setter.
         self.background = pg.transform.scale(self._original_background, tuple(
             int(size*scale) for size in self._original_background.get_size()))
-        self._true_pos = Vector2(*(coord*scale for coord in self._true_pos))
-        display_rect = pg.Rect(tuple(self._true_pos), self.display.get_size())
+        self.true_pos = Vector2(*(coord*scale for coord in self.true_pos))
+        display_rect = pg.Rect(tuple(self.true_pos), self.display.get_size())
         display_rect.clamp_ip(self._scrolling_area)
         if (display_rect.topleft != tuple(map(int, self.true_pos))):
-            self._true_pos = Vector2(*display_rect.topleft)
-        self._display_pos = Vector2(*map(int, self._true_pos))
+            self.true_pos = Vector2(*display_rect.topleft)
         self.display.fill((0, 0, 0))
-        self.display.blit(self._background, self._scrolling_area.topleft,
-                          (tuple(self._display_pos), self.display.get_size()))
+        self.display.blit(self.background, self._scrolling_area.topleft,
+                          (tuple(self.display_pos), self.display.get_size()))
         self._zoom = scale
 
     @Vector2.sequence2vector2
@@ -373,7 +337,7 @@ class ScrollBackground:
         new_display_pos = Vector2(point.x - self.display.get_width()/2,
                                   point.y - self.display.get_height()/2)
         if (new_display_pos - self.true_pos).length >= 1:
-            self.scroll(new_display_pos - self._display_pos)
+            self.scroll(new_display_pos - self.display_pos)
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
@@ -390,16 +354,14 @@ class ScrollBackground:
         None
 
         """
-        prev_pos = self._display_pos
-        self._true_pos += position_change
-        self._display_pos = Vector2(*map(int, self._true_pos))
+        prev_pos = self.display_pos
+        self.true_pos += position_change
         display_rect = pg.Rect(
-            tuple(self._display_pos), self.display.get_size())
+            tuple(self.display_pos), self.display.get_size())
         if not self.scrolling_area.contains(display_rect):
             display_rect.clamp_ip(self.scrolling_area)
-            self._display_pos = Vector2(*display_rect.topleft)
-            self._true_pos = Vector2(*display_rect.topleft)
-        position_change = self._display_pos - prev_pos
+            self.true_pos = Vector2(*display_rect.topleft)
+        position_change = self.display_pos - prev_pos
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
 
@@ -422,35 +384,35 @@ class ScrollBackground:
         area1 = None
         area2 = None
         if position_change.x > 0:
-            scroll_x = (self._display_pos.x +
+            scroll_x = (self.display_pos.x +
                         self.display.get_width() - position_change.x)
-            pos1 = scroll_x - self._display_pos.x, 0
+            pos1 = scroll_x - self.display_pos.x, 0
             area1 = pg.Rect(
                 scroll_x,
-                self._display_pos.y,
+                self.display_pos.y,
                 position_change.x,
                 self.display.get_height())
         elif position_change.x < 0:
             pos1 = 0, 0
             area1 = pg.Rect(
-                self._display_pos.x,
-                self._display_pos.y,
+                self.display_pos.x,
+                self.display_pos.y,
                 -position_change.x,
                 self.display.get_height())
         if position_change.y > 0:
-            scroll_y = (self._display_pos.y +
+            scroll_y = (self.display_pos.y +
                         self.display.get_height() - position_change.y)
-            pos2 = 0, scroll_y - self._display_pos.y
+            pos2 = 0, scroll_y - self.display_pos.y
             area2 = pg.Rect(
-                self._display_pos.x,
+                self.display_pos.x,
                 scroll_y,
                 self.display.get_width(),
                 position_change.y)
         elif position_change.y < 0:
             pos2 = 0, 0
             area2 = pg.Rect(
-                self._display_pos.x,
-                self._display_pos.y,
+                self.display_pos.x,
+                self.display_pos.y,
                 self.display.get_width(),
                 -position_change.y)
         if area1 and area2:
