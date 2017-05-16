@@ -345,6 +345,7 @@ class ScrollBackground:
         Returns
         -------
         None
+
         """
         # Using setter.
         self.background = pg.transform.scale(self._original_background, tuple(
@@ -352,12 +353,13 @@ class ScrollBackground:
         self._true_pos = Vector2(*(coord*scale for coord in self._true_pos))
         display_rect = pg.Rect(tuple(self._true_pos), self.display.get_size())
         display_rect.clamp_ip(self._scrolling_area)
-        if (display_rect.topleft != tuple(map(int, self_true_pos))):
+        if (display_rect.topleft != tuple(map(int, self.true_pos))):
             self._true_pos = Vector2(*display_rect.topleft)
         self._display_pos = Vector2(*map(int, self._true_pos))
         self.display.fill((0, 0, 0))
-        self.display.blit(self._background, background_pos,
-                           (tuple(self._display_pos), self.display.get_size()))
+        self.display.blit(self._background, self._scrolling_area.topleft,
+                          (tuple(self._display_pos), self.display.get_size()))
+        self._zoom = scale
 
     @Vector2.sequence2vector2
     def center(self, point):
@@ -377,8 +379,7 @@ class ScrollBackground:
     def scroll(self, position_change):
         """Scroll the display by position_change
 
-        If the display isn't inside `self._scrolling_area`
-        after being moved it will be moved back inside.
+        The display will be centered on the background.
 
         Parameters
         ----------
@@ -392,11 +393,9 @@ class ScrollBackground:
         prev_pos = self._display_pos
         self._true_pos += position_change
         self._display_pos = Vector2(*map(int, self._true_pos))
-        self._display_pos = Vector2(*(int(coord) for coord in self._true_pos))
         display_rect = pg.Rect(
             tuple(self._display_pos), self.display.get_size())
         if not self.scrolling_area.contains(display_rect):
-            # Move display inside scrolling_area
             display_rect.clamp_ip(self.scrolling_area)
             self._display_pos = Vector2(*display_rect.topleft)
             self._true_pos = Vector2(*display_rect.topleft)
