@@ -250,6 +250,21 @@ class ScrollBackground:
         self._scrolling_area = pg.Rect(
             background_pos, self.background.get_size())
 
+    def blit(self, *args, **kwargs):
+        """Blit to _original_background and update background.
+
+        This makes it easier to change the background.
+
+        Returns
+        -------
+        pygame.Rect
+
+        """
+        blit_rect = self._original_background.blit(*args, **kwargs)
+        # Update background.
+        self.zoom = self._zoom
+        return blit_rect
+
     @property
     def display_pos(self):
         """Return true_pos mapped to integer values.
