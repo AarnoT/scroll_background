@@ -78,6 +78,39 @@ def test_scroll_output(scroll_bg):
     assert compare_surfaces(correct_surf, scroll_bg.display)
 
 
+def test_scroll_output2(scroll_bg):
+    """Test scroll output with a small background surface.
+    """
+    scroll_bg.display = pg.Surface((1000, 200))
+    scroll_bg.display_pos = (-100, 0)
+    # Draw a grid.
+    for x in range(0, 800, 50):
+        for y in range(0, 800, 50):
+            pg.draw.rect(
+                scroll_bg.background, (0, 255, 0), (x, y, 50, 50))
+    for x in range(0, 800, 100):
+        for y in range(50, 800, 100):
+            pg.draw.rect(
+                scroll_bg.background, (0, 0, 255), (x, y, 50, 50))
+    for x in range(50, 800, 100):
+        for y in range(0, 800, 100):
+            pg.draw.rect(
+                scroll_bg.background, (0, 0, 255), (x, y, 50, 50))
+    scroll_bg.display.blit(
+            scroll_bg.background,
+            (0, 0),
+            pg.Rect(tuple(scroll_bg.display_pos),
+                    scroll_bg.display.get_size()))
+
+    display_area = pg.Rect(tuple(scroll_bg.display_pos),
+                           scroll_bg.display.get_size())
+    correct_surf = pg.Surface((1000, 200))
+    correct_surf.blit(scroll_bg.background, (0, 0), display_area)
+    scroll_bg.scroll((0, 600))
+    scroll_bg.scroll((0, -600))
+    assert compare_surfaces(correct_surf, scroll_bg.display)
+
+
 def test_redraw_areas(scroll_bg):
     """Redraw areas should be inside scrolling_area.
     """
