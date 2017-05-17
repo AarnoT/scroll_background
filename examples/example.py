@@ -1,6 +1,6 @@
 import pygame as pg
 
-from scroll_background import ScrollBackground
+from scroll_background import Vector2, ScrollBackground
 
 pg.init()
 
@@ -22,24 +22,19 @@ class Game():
     def __init__(self):
         self.background = pg.Surface((800, 800))
         self.display = pg.display.set_mode((600, 600))
-        display_rect = pg.Rect((0, 0), self.display.get_size())
-        display_rect.clamp_ip((0, 0), self.background.get_size())
-        display_pos = display_rect.topleft
         draw_grid(self.background)
-        self.scroll_bg = ScrollBackground(
-            self.background, self.display, display_pos)
+        background_width, background_height = self.background.get_size()
+        start_pos = (background_width//2 - 50, background_height//2 - 50)
+        self.player_rect = pg.Rect(start_pos, (100, 100))
+        self.scroll_bg = ScrollBackground(self.background, self.display, (0, 0))
+        centered_pos = self.scroll_bg.centered_pos(self.player_rect.center)
+        self.scroll_bg.display_pos = centered_pos
         self.scroll_bg.blit(pg.Surface((123, 123)), (300, 300))
-        self.display.blit(
-            self.scroll_bg.background, (0, 0),
-            pg.Rect(display_pos, self.display.get_size()))
+        self.scroll_bg.redraw_display()
 
-        self.player_rect = pg.Rect(
-            self.background.get_width()//2 - 50,
-            self.background.get_width()//2 - 50, 100, 100)
-        self.true_x_pos, self.true_y_pos = self.player_rect.topleft
-        self.max_scroll = self.background.get_width() - self.player_rect.width
-        self.x_size, self.y_size = self.player_rect.size
         self.speed = 5
+        self.true_pos = Vector2(*self.player_rect.topleft)
+        self.max_scroll = self.background.get_width() - self.player_rect.width
         self.clock = pg.time.Clock()
         self.running = True
 
@@ -47,32 +42,17 @@ class Game():
         while self.running:
             delta_time = self.clock.tick(60)/1000 * 60
             prev_player_rect = self.player_rect.copy()
-            prev_player_rect.x -= self.scroll_bg.scrolling_area.x
-            prev_player_rect.y -= self.scroll_bg.scrolling_area.y
             self.handle_input(delta_time)
-            self.scroll_bg.center((self.true_x_pos + self.x_size/2,
-                                   self.true_y_pos + self.y_size/2))
-            clear_rect = (prev_player_rect.x +
-                          self.scroll_bg.scrolling_area.x -
-                          self.scroll_bg.display_pos.x,
-                          prev_player_rect.y +
-                          self.scroll_bg.scrolling_area.y -
-                          self.scroll_bg.display_pos.y,
-                          *prev_player_rect.size)
-            self.player_rect = pg.Rect(
-                self.true_x_pos + self.scroll_bg.scrolling_area.x,
-                self.true_y_pos + self.scroll_bg.scrolling_area.y,
-                self.x_size,
-                self.y_size)
-            draw_rect = (
-                self.player_rect.left - self.scroll_bg.display_pos.x,
-                self.player_rect.top - self.scroll_bg.display_pos.y,
-                self.x_size,
-                self.y_size)
-            self.display.blit(
-                self.scroll_bg.background,
-                clear_rect,
-                prev_player_rect)
+            self.scroll_bg.center(self.player_rect.center)
+            self.player_rect = pg.Rect(*self.true_pos, *self.player_rect.size)
+            player_pos = Vector2(*self.player_rect.topleft)
+            prev_player_pos = Vector2(*prev_player_rect.topleft)
+            clear_rect = (tuple(prev_player_pos - self.scroll_bg.display_pos),
+                          prev_player_rect.size)
+            draw_rect = (tuple(player_pos - self.scroll_bg.display_pos),
+                         self.player_rect.size)
+            self.display.blit(self.scroll_bg.background, clear_rect,
+                              prev_player_rect)
             pg.draw.rect(self.display, (255, 0, 0), draw_rect)
             pg.display.set_caption('FPS: {:.2f}'.format(self.clock.get_fps()))
             pg.display.update()
@@ -84,34 +64,30 @@ class Game():
                 break
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
-                    self.scroll_bg.zoom = 1 / 3
-                    self.true_x_pos /= 3
-                    self.true_y_pos /= 3
-                    self.x_size /= 3
-                    self.y_size /= 3
-                    self.max_scroll /= 3
-                    self.speed /= 3
+                    self.scale(1 / 3)
                     continue
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_z:
-                    self.scroll_bg.zoom = 1.0
-                    self.true_x_pos *= 3
-                    self.true_y_pos *= 3
-                    self.x_size *= 3
-                    self.y_size *= 3
-                    self.max_scroll *= 3
-                    self.speed *= 3
+                    self.scale(3)
                     continue
         if pg.key.get_pressed()[pg.K_LEFT]:
-            self.true_x_pos = max(self.true_x_pos - self.speed*delta_time, 0)
+            self.true_pos.x = max(self.true_pos.x - self.speed*delta_time, 0)
         elif pg.key.get_pressed()[pg.K_RIGHT]:
-            self.true_x_pos = min(
-                self.true_x_pos + self.speed*delta_time, self.max_scroll)
+            self.true_pos.x = min(
+                self.true_pos.x + self.speed*delta_time, self.max_scroll)
         if pg.key.get_pressed()[pg.K_UP]:
-            self.true_y_pos = max(self.true_y_pos - self.speed*delta_time, 0)
+            self.true_pos.y = max(self.true_pos.y - self.speed*delta_time, 0)
         elif pg.key.get_pressed()[pg.K_DOWN]:
-            self.true_y_pos = min(
-                self.true_y_pos + self.speed*delta_time, self.max_scroll)
+            self.true_pos.y = min(
+                self.true_pos.y + self.speed*delta_time, self.max_scroll)
+
+    def scale(self, factor):
+        self.scroll_bg.zoom *= factor
+        self.true_pos.scale(factor)
+        self.player_rect.width *= factor
+        self.player_rect.height *= factor
+        self.max_scroll *= factor
+        self.speed *= factor
 
 
 if __name__ == '__main__':
