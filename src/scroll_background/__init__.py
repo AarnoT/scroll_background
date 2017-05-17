@@ -190,22 +190,18 @@ class ScrollBackground:
 
     Attributes
     ----------
-    background
     display_pos
     scrolling_area
     zoom
 
     _original_background : pygame.Surface
-        Copy of the original background surface. You need to draw to
-        it before creating a `ScrollBackground`, because it's a copy.
-    _background : pygame.Surface
-        Copy of the background used for zooming.
+        Copy of the original background surface.
+    background : pygame.Surface
+        Copy of the original background used for zooming.
     display : pygame.Surface
         The display surface.
     true_pos : Vector2
         Accurate display position.
-    _scrolling_area : pygame.Rect
-        The area that limits scrolling.
     _zoom : float
         The factor by which the background is zoomed.
 
@@ -216,39 +212,9 @@ class ScrollBackground:
         self._original_background = background.copy()
         self.display = display
         self.true_pos = display_pos
-        # Setter sets self._scrolling_area and self._background.
+        # Setter sets self.scrolling_area and self._background.
         self.background = background.copy()
         self._zoom = 1.0
-
-    @property
-    def background(self):
-        """Return the background.
-
-        Returns
-        -------
-        pygame.Surface
-
-        """
-        return self._background
-
-    @background.setter
-    def background(self, value):
-        """Set the background to value.
-
-        Returns
-        -------
-        None
-
-        """
-        self._background = value
-        # Needed in case background is smaller than display.
-        background_pos = (
-            max(int(self.display.get_width() -
-                    self.background.get_width())//2, 0),
-            max(int(self.display.get_height() -
-                    self.background.get_height())//2, 0))
-        self._scrolling_area = pg.Rect(
-            background_pos, self.background.get_size())
 
     def blit(self, *args, **kwargs):
         """Blit to _original_background and update background.
@@ -294,14 +260,16 @@ class ScrollBackground:
 
     @property
     def scrolling_area(self):
-        """Return a copy of the scrolling area.
+        """The area inside which the display can be scrolled.
+
+        The top left corner is always at (0, 0).
 
         Returns
         -------
         scrolling_area : pygame.Rect
 
         """
-        return self._scrolling_area.copy()
+        return pg.Rect((0, 0), self.background.get_size())
 
     @property
     def zoom(self):
@@ -332,11 +300,11 @@ class ScrollBackground:
             int(size*scale) for size in self._original_background.get_size()))
         self.true_pos = Vector2(*(coord*scale for coord in self.true_pos))
         display_rect = pg.Rect(tuple(self.true_pos), self.display.get_size())
-        display_rect.clamp_ip(self._scrolling_area)
+        display_rect.clamp_ip(self.scrolling_area)
         if (display_rect.topleft != tuple(map(int, self.true_pos))):
             self.true_pos = Vector2(*display_rect.topleft)
         self.display.fill((0, 0, 0))
-        self.display.blit(self.background, self._scrolling_area.topleft,
+        self.display.blit(self.background, (0, 0),
                           (tuple(self.display_pos), self.display.get_size()))
         self._zoom = scale
 
@@ -349,16 +317,17 @@ class ScrollBackground:
         point : Vector2
 
         """
-        new_display_pos = Vector2(point.x - self.display.get_width()/2,
-                                  point.y - self.display.get_height()/2)
-        if (new_display_pos - self.true_pos).length >= 1:
-            self.scroll(new_display_pos - self.display_pos)
+        centered_pos = Vector2(point.x - self.display.get_width()/2,
+                               point.y - self.display.get_height()/2)
+        if (centered_pos - self.true_pos).length >= 1:
+            self.scroll(centered_pos - self.true_pos)
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
         """Scroll the display by position_change
 
-        The display will be centered on the background.
+        The display will be centered on the background if it isn't
+        already inside it.
 
         Parameters
         ----------
@@ -453,6 +422,4 @@ class ScrollBackground:
 
         """
         for pos, rect in zip(redraw_positions, redraw_areas):
-            pos = (coord + offset for coord, offset
-                   in zip(pos, self._scrolling_area.topleft))
             self.display.blit(self.background, tuple(pos), rect)
