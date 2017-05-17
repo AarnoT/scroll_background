@@ -313,10 +313,7 @@ class ScrollBackground:
             int(size*scale) for size in self._original_background.get_size()))
         self.true_pos.scale(scale)
         self.move_or_center_display()
-
-        self.display.fill((0, 0, 0))
-        self.display.blit(self.background, (0, 0),
-                          (tuple(self.display_pos), self.display.get_size()))
+        self.redraw_display()
         self._zoom = scale
 
     @Vector2.sequence2vector2
@@ -456,3 +453,15 @@ class ScrollBackground:
         """
         for pos, rect in zip(redraw_positions, redraw_areas):
             self.display.blit(self.background, tuple(pos), rect)
+
+    def redraw_display(self):
+        """Draw the background to the display.
+
+        Returns
+        -------
+        None
+
+        """
+        self.display.fill((0, 0, 0))
+        self.display.blit(self.background, (0, 0),
+                        (tuple(self.display_pos), self.display.get_size()))
