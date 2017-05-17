@@ -212,7 +212,6 @@ class ScrollBackground:
         self._original_background = background.copy()
         self.display = display
         self.true_pos = display_pos
-        # Setter sets self.scrolling_area and self._background.
         self.background = background.copy()
         self._zoom = 1.0
 
@@ -295,14 +294,11 @@ class ScrollBackground:
         None
 
         """
-        # Using setter.
         self.background = pg.transform.scale(self._original_background, tuple(
             int(size*scale) for size in self._original_background.get_size()))
         self.true_pos = Vector2(*(coord*scale for coord in self.true_pos))
-        display_rect = pg.Rect(tuple(self.true_pos), self.display.get_size())
-        display_rect.clamp_ip(self.scrolling_area)
-        if (display_rect.topleft != tuple(map(int, self.true_pos))):
-            self.true_pos = Vector2(*display_rect.topleft)
+        self.move_or_center_display()
+
         self.display.fill((0, 0, 0))
         self.display.blit(self.background, (0, 0),
                           (tuple(self.display_pos), self.display.get_size()))
@@ -341,9 +337,6 @@ class ScrollBackground:
     def scroll(self, position_change):
         """Scroll the display by position_change
 
-        The display will be centered on the background if it isn't
-        already inside it.
-
         Parameters
         ----------
         position_change : Vector2
@@ -355,14 +348,24 @@ class ScrollBackground:
         """
         prev_pos = self.display_pos
         self.true_pos += position_change
-        display_rect = pg.Rect(
-            tuple(self.display_pos), self.display.get_size())
-        if not self.scrolling_area.contains(display_rect):
-            display_rect.clamp_ip(self.scrolling_area)
-            self.true_pos = Vector2(*display_rect.topleft)
+        self.move_or_center_display()
         position_change = self.display_pos - prev_pos
+
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
+
+    def move_or_center_display(self):
+        """Move the display inside the background or center it.
+
+        Returns
+        -------
+        None
+
+        """
+        display_rect = pg.Rect(
+            tuple(self.true_pos), self.display.get_size())
+        display_rect.clamp_ip(self.scrolling_area)
+        self.true_pos = Vector2(*display_rect.topleft)
 
     @Vector2.sequence2vector2
     def _calculate_redraw_areas(self, position_change):
