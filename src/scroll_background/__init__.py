@@ -61,6 +61,21 @@ class Vector2:
         """
         return math.hypot(self.x, self.y)
 
+    def scale(self, scale):
+        """Multiply vector by scale.
+
+        Parameters
+        ----------
+        scale : float
+
+        Returns
+        -------
+        None
+
+        """
+        self.x *= scale
+        self.y *= scale
+
     def copy(self):
         """Return a copy of the vector.
 
@@ -296,7 +311,7 @@ class ScrollBackground:
         """
         self.background = pg.transform.scale(self._original_background, tuple(
             int(size*scale) for size in self._original_background.get_size()))
-        self.true_pos = Vector2(*(coord*scale for coord in self.true_pos))
+        self.true_pos.scale(scale)
         self.move_or_center_display()
 
         self.display.fill((0, 0, 0))
