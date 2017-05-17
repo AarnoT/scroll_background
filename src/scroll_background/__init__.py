@@ -309,6 +309,22 @@ class ScrollBackground:
         self._zoom = scale
 
     @Vector2.sequence2vector2
+    def centered_pos(self, point):
+        """Return the position where the display is centered on a point.
+
+        Parameters
+        ----------
+        point : Vector2
+
+        Returns
+        -------
+        centered_pos : Vector2
+
+        """
+        return point - Vector2(self.display.get_width()/2,
+                               self.display.get_height()/2)
+
+    @Vector2.sequence2vector2
     def center(self, point):
         """Center the display on a point.
 
@@ -317,8 +333,7 @@ class ScrollBackground:
         point : Vector2
 
         """
-        centered_pos = Vector2(point.x - self.display.get_width()/2,
-                               point.y - self.display.get_height()/2)
+        centered_pos = self.centered_pos(point)
         if (centered_pos - self.true_pos).length >= 1:
             self.scroll(centered_pos - self.true_pos)
 
