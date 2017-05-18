@@ -115,11 +115,11 @@ def test_redraw_areas(scroll_bg):
     """Redraw areas should be inside scrolling_area.
     """
     redraw_positions, _ = scroll_bg._calculate_redraw_areas(
-        Vector2(50, 50))
+        Vector2((50, 50)))
     assert redraw_positions[0] == (150, 0)
     assert redraw_positions[1] == (0, 150)
     redraw_positions, _ = scroll_bg._calculate_redraw_areas(
-        Vector2(-50, -50))
+        Vector2((-50, -50)))
     assert redraw_positions[0] == (0, 0)
     assert redraw_positions[1] == (0, 0)
 
@@ -128,11 +128,11 @@ def test_redraw_area_size(scroll_bg):
     """Test that redraw areas are the correct size.
     """
     _, redraw_areas = scroll_bg._calculate_redraw_areas(
-        Vector2(50, 50))
+        Vector2((50, 50)))
     assert redraw_areas[0].size == (50, 200)
     assert redraw_areas[1].size == (200, 50)
     _, redraw_areas = scroll_bg._calculate_redraw_areas(
-        Vector2(-50, -50))
+        Vector2((-50, -50)))
     assert redraw_areas[0].size == (50, 200)
     assert redraw_areas[1].size == (200, 50)
 
