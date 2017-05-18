@@ -86,6 +86,20 @@ class Vector2:
         """
         return Vector2(self.x, self.y)
 
+    def __eq__(self, other):
+        """Test if two vectors are equal.
+
+        Parameters
+        ----------
+        other : Vector2
+
+        Returns
+        -------
+        bool
+
+        """
+        return self.x == other.x and self.y == other.y
+
     def __add__(self, other):
         """Return the sum of two vectors.
 
@@ -464,4 +478,4 @@ class ScrollBackground:
         """
         self.display.fill((0, 0, 0))
         self.display.blit(self.background, (0, 0),
-                        (tuple(self.display_pos), self.display.get_size()))
+                          (tuple(self.display_pos), self.display.get_size()))
