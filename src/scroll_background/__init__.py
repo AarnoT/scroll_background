@@ -19,7 +19,7 @@ class Vector2:
 
     Parameters
     ----------
-    x, y : float
+    pos : iterable of float
         The X and Y coordinates.
 
     Attributes
@@ -32,8 +32,8 @@ class Vector2:
     --------
     Adding and substracting vectors.
 
-    >>> vector1 = Vector2(10, 5)
-    >>> vector2 = Vector2(-5, 2)
+    >>> vector1 = Vector2((10, 5))
+    >>> vector2 = Vector2((-5, 2))
     >>> vector1 + vector2
     <Vector2(5, 7)>
     >>> vector1 - vector2
@@ -41,14 +41,13 @@ class Vector2:
 
     Converting an instance of `Vector2` to a tuple.
 
-    >>> tuple(Vector2(12, 30))
+    >>> tuple(Vector2((12, 30)))
     (12, 30)
 
     """
 
-    def __init__(self, x, y):
-        self.x = float(x)
-        self.y = float(y)
+    def __init__(self, pos):
+        self.x, self.y = (float(coord) for coord in pos)
 
     @property
     def length(self):
@@ -84,7 +83,7 @@ class Vector2:
         copy : Vector2
 
         """
-        return Vector2(self.x, self.y)
+        return Vector2((self.x, self.y))
 
     def __eq__(self, other):
         """Test if two vectors are equal.
@@ -112,7 +111,7 @@ class Vector2:
         sum  : Vector2
 
         """
-        return Vector2(self.x + other.x, self.y + other.y)
+        return Vector2((self.x + other.x, self.y + other.y))
 
     def __radd__(self, other):
         """Return the sum of two vectors.
@@ -126,7 +125,7 @@ class Vector2:
         sum  : Vector2
 
         """
-        return Vector2(self.x + other.x, self.y + other.y)
+        return Vector2((self.x + other.x, self.y + other.y))
 
     def __sub__(self, other):
         """Return the difference of two vectors.
@@ -140,7 +139,7 @@ class Vector2:
         difference : Vector2
 
         """
-        return Vector2(self.x - other.x, self.y - other.y)
+        return Vector2((self.x - other.x, self.y - other.y))
 
     def __rsub__(self, other):
         """Return the difference of two vectors.
@@ -154,7 +153,7 @@ class Vector2:
         difference : Vector2
 
         """
-        return Vector2(other.x - self.x, other.y - self.y)
+        return Vector2((other.x - self.x, other.y - self.y))
 
     def __iter__(self):
         """Iterate a vector.
@@ -198,7 +197,7 @@ class Vector2:
             arg_list = []
             for arg in args:
                 if isinstance(arg, collections.abc.Sequence) and len(arg) == 2:
-                    arg_list.append(Vector2(*arg))
+                    arg_list.append(Vector2(arg))
                 else:
                     arg_list.append(arg)
             if kwargs:
@@ -268,7 +267,7 @@ class ScrollBackground:
         Vector2
 
         """
-        return Vector2(*map(int, self.true_pos))
+        return Vector2(map(int, self.true_pos))
 
     @display_pos.setter
     @Vector2.sequence2vector2
@@ -343,8 +342,8 @@ class ScrollBackground:
         centered_pos : Vector2
 
         """
-        return point - Vector2(self.display.get_width()/2,
-                               self.display.get_height()/2)
+        return point - Vector2((self.display.get_width()/2,
+                                self.display.get_height()/2))
 
     @Vector2.sequence2vector2
     def center(self, point):
@@ -388,10 +387,9 @@ class ScrollBackground:
         None
 
         """
-        display_rect = pg.Rect(
-            tuple(self.true_pos), self.display.get_size())
+        display_rect = pg.Rect(tuple(self.true_pos), self.display.get_size())
         display_rect.clamp_ip(self.scrolling_area)
-        self.true_pos = Vector2(*display_rect.topleft)
+        self.true_pos = Vector2(display_rect.topleft)
 
     @Vector2.sequence2vector2
     def _calculate_redraw_areas(self, position_change):
