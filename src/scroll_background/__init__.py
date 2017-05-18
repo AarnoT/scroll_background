@@ -230,6 +230,8 @@ class ScrollBackground:
         The display surface.
     true_pos : Vector2
         Accurate display position.
+    clear_rects : list of pygame.Rect
+        Rects used to clear sprites from the background.
     _zoom : float
         The factor by which the background is zoomed.
 
@@ -241,6 +243,7 @@ class ScrollBackground:
         self.display = display
         self.true_pos = display_pos
         self.background = background.copy()
+        self.clear_rects = []
         self._zoom = 1.0
 
     def blit(self, *args, **kwargs):
@@ -477,3 +480,32 @@ class ScrollBackground:
         self.display.fill((0, 0, 0))
         self.display.blit(self.background, (0, 0),
                           (tuple(self.display_pos), self.display.get_size()))
+
+    def draw_sprites(self, sprites):
+        """Clear previously drawn sprites and draw new ones.
+
+        Sprites can be any objects with pygame.Rect as the .rect
+        attribute and a pygame.Surface as the .image attribute. The
+        position of the sprites should be relative to the background.
+
+        Parameters
+        ----------
+        sprites : iterable of sprites
+
+        Returns
+        -------
+        draw_rects : list of pygame.Rect
+
+        """
+        draw_rects = []
+        for rect in self.clear_rects:
+            clear_pos = Vector2(rect.topleft) - self.display_pos
+            draw_rects.append(
+                self.display.blit(self.background, tuple(clear_pos), rect))
+        self.clear_rects.clear()
+        for sprite in sprites:
+            draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
+            draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
+            self.clear_rects.append(sprite.rect)
+            draw_rects.append(draw_rect)
+        return draw_rects
