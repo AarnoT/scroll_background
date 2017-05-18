@@ -194,7 +194,7 @@ class Vector2:
 
         """
         @functools.wraps(method)
-        def wrapper(self, *args, **kwargs):
+        def wrapper(*args, **kwargs):
             arg_list = []
             for arg in args:
                 if isinstance(arg, collections.abc.Sequence) and len(arg) == 2:
@@ -202,9 +202,9 @@ class Vector2:
                 else:
                     arg_list.append(arg)
             if kwargs:
-                return method(self, *arg_list, **kwargs)
+                return method(*arg_list, **kwargs)
             else:
-                return method(self, *arg_list)
+                return method(*arg_list)
         return wrapper
 
 
