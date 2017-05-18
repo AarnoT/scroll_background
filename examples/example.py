@@ -18,7 +18,6 @@ def draw_grid(surface):
 
 
 class Player:
-
     def __init__(self, background_size):
         start_pos = (background_size.x//2 - 50, background_size.y//2 - 50)
         self.rect = pg.Rect(start_pos, (100, 100))
@@ -53,16 +52,14 @@ class Player:
 
 
 class Game():
-
     def __init__(self):
         background = pg.Surface((800, 800))
-        display = pg.display.set_mode((600, 600))
+        display = pg.display.set_mode((900, 900), pg.RESIZABLE)
         draw_grid(background)
         self.scroll_bg = ScrollBackground(background, display, (0, 0))
 
         self.player = Player(Vector2(background.get_size()))
-        centered_pos = self.scroll_bg.centered_pos(self.player.rect.center)
-        self.scroll_bg.display_pos = centered_pos
+        self.scroll_bg.move_or_center_display()
         self.scroll_bg.blit(pg.Surface((123, 123)), (300, 300))
         self.scroll_bg.redraw_display()
 
@@ -86,12 +83,18 @@ class Game():
                 break
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_z:
-                    self.scale(1 / 3)
+                    self.scale(2)
                     continue
             elif event.type == pg.KEYUP:
                 if event.key == pg.K_z:
-                    self.scale(3)
+                    self.scale(1 / 2)
                     continue
+            elif event.type == pg.VIDEORESIZE:
+                self.scroll_bg.display = (
+                    pg.display.set_mode(event.size, pg.RESIZABLE))
+                self.scroll_bg.move_or_center_display()
+                self.scroll_bg.redraw_display()
+
 
     def scale(self, factor):
         self.scroll_bg.zoom *= factor
