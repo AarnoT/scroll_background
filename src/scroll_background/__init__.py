@@ -39,7 +39,7 @@ class Vector2:
     >>> vector1 - vector2
     <Vector2(15, 3)>
 
-    Converting an instance of `Vector2` to a tuple.
+    Converting an instance of `Vector2` to a `tuple`.
 
     >>> tuple(Vector2((12, 30)))
     (12, 30)
@@ -240,9 +240,9 @@ class ScrollBackground:
     @Vector2.sequence2vector2
     def __init__(self, background, display, display_pos):
         self._original_background = background.copy()
+        self.background = background.copy()
         self.display = display
         self.true_pos = display_pos
-        self.background = background.copy()
         self.clear_rects = []
         self._zoom = 1.0
 
@@ -325,8 +325,10 @@ class ScrollBackground:
         None
 
         """
-        self.background = pg.transform.scale(self._original_background, tuple(
-            int(size*scale) for size in self._original_background.get_size()))
+        original_bg_size = self._original_background.get_size()
+        new_width, new_height = (int(size*scale) for size in original_bg_size)
+        self.background = pg.transform.scale(self._original_background,
+                                             (new_width, new_height))
         self.true_pos.scale(scale)
         self.move_or_center_display()
         self.redraw_display()
@@ -350,7 +352,7 @@ class ScrollBackground:
 
     @Vector2.sequence2vector2
     def center(self, point):
-        """Center the display on a point.
+        """Scroll the display so that it is centered on a point.
 
         Parameters
         ----------
@@ -383,7 +385,7 @@ class ScrollBackground:
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
 
     def move_or_center_display(self):
-        """Move the display inside the background or center it.
+        """Move the display onto the background or center it.
 
         Returns
         -------
@@ -503,6 +505,7 @@ class ScrollBackground:
             draw_rects.append(
                 self.display.blit(self.background, tuple(clear_pos), rect))
         self.clear_rects.clear()
+
         for sprite in sprites:
             draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
             draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
