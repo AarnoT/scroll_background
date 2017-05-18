@@ -33,7 +33,7 @@ class Game():
         self.scroll_bg.redraw_display()
 
         self.speed = 5
-        self.true_pos = Vector2(*self.player_rect.topleft)
+        self.true_pos = Vector2(self.player_rect.topleft)
         self.max_scroll = self.background.get_width() - self.player_rect.width
         self.clock = pg.time.Clock()
         self.running = True
@@ -45,8 +45,8 @@ class Game():
             self.handle_input(delta_time)
             self.scroll_bg.center(self.player_rect.center)
             self.player_rect = pg.Rect(*self.true_pos, *self.player_rect.size)
-            player_pos = Vector2(*self.player_rect.topleft)
-            prev_player_pos = Vector2(*prev_player_rect.topleft)
+            player_pos = Vector2(self.player_rect.topleft)
+            prev_player_pos = Vector2(prev_player_rect.topleft)
             clear_rect = (tuple(prev_player_pos - self.scroll_bg.display_pos),
                           prev_player_rect.size)
             draw_rect = (tuple(player_pos - self.scroll_bg.display_pos),
