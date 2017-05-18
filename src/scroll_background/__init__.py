@@ -35,14 +35,14 @@ class Vector2:
     >>> vector1 = Vector2((10, 5))
     >>> vector2 = Vector2((-5, 2))
     >>> vector1 + vector2
-    <Vector2(5, 7)>
+    <Vector2(5.0, 7.0)>
     >>> vector1 - vector2
-    <Vector2(15, 3)>
+    <Vector2(15.0, 3.0)>
 
     Converting an instance of `Vector2` to a `tuple`.
 
     >>> tuple(Vector2((12, 30)))
-    (12, 30)
+    (12.0, 30.0)
 
     """
 
@@ -512,3 +512,8 @@ class ScrollBackground:
             self.clear_rects.append(sprite.rect)
             draw_rects.append(draw_rect)
         return draw_rects
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
