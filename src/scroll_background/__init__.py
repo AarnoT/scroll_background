@@ -358,6 +358,10 @@ class ScrollBackground:
         ----------
         point : Vector2
 
+        Returns
+        -------
+        None
+
         """
         centered_pos = self.centered_pos(point)
         if (centered_pos - self.true_pos).length >= 1:
@@ -365,7 +369,7 @@ class ScrollBackground:
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
-        """Scroll the display by position_change
+        """Scroll the display by position_change.
 
         Parameters
         ----------
@@ -374,6 +378,16 @@ class ScrollBackground:
         Returns
         -------
         None
+
+        Examples
+        --------
+        Scrolling the display 100 pixels to the right and down.
+
+        >>> background = ScrollBackground(pg.Surface((600, 600)),
+        ...                               pg.Surface((200, 200)), (200, 200))
+        >>> background.scroll((100, 100))
+        >>> tuple(background.display_pos)
+        (300.0, 300.0)
 
         """
         prev_pos = self.display_pos
@@ -390,6 +404,16 @@ class ScrollBackground:
         Returns
         -------
         None
+
+        Examples
+        --------
+        Centering the display.
+
+        >>> background = ScrollBackground(pg.Surface((600, 600)),
+        ...                               pg.Surface((800, 800)), (200, 200))
+        >>> background.move_or_center_display()
+        >>> tuple(background.display_pos)
+        (-100.0, -100.0)
 
         """
         display_rect = pg.Rect(tuple(self.true_pos), self.display.get_size())
