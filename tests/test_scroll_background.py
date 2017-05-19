@@ -146,3 +146,20 @@ def test_no_drift(scroll_bg):
     for n in range(30):
         scroll_bg.center(center_pos)
     assert pos1 == tuple(scroll_bg.display_pos)
+
+
+def test_draw_sprites(scroll_bg):
+    """Test that sprites are cleared properly.
+    """
+    scroll_bg.background.fill((232, 32, 3))
+    scroll_bg.redraw_display()
+    sprite = pg.sprite.Sprite()
+    sprite.image = pg.Surface((50, 50))
+    sprite.rect = pg.Rect(375, 375, 50, 50)
+    scroll_bg.draw_sprites((sprite,))
+    scroll_bg.scroll((30, 30))
+    scroll_bg.draw_sprites(())
+    assert len(scroll_bg.clear_rects) == 0
+    correct_surf = scroll_bg.background.subsurface(
+        (tuple(scroll_bg.display_pos), scroll_bg.display.get_size()))
+    assert compare_surfaces(correct_surf, scroll_bg.display)
