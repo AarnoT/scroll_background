@@ -6,6 +6,7 @@ This Python package comes with the ScrollBackground class,
 which lets you scroll Pygame surfaces and draw sprites efficiently.
 scroll_background also includes a zooming feature.
 
+============
 Installation
 ============
 
@@ -22,6 +23,7 @@ the development requirements::
 
     pip install -r requirements-dev.txt
 
+=====
 Usage
 =====
 
