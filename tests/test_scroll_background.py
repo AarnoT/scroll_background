@@ -1,4 +1,8 @@
 """Tests for the ScrollBackground class
+
+To run these tests you need to have scroll_background installed or have
+its directory in the path variable. You also need pytest. To run the
+tests type pytest in the command prompt.
 """
 
 import pytest
