@@ -56,12 +56,12 @@ class Game():
         background = pg.Surface((800, 800))
         display = pg.display.set_mode((900, 900), pg.RESIZABLE)
         draw_grid(background)
-        self.scroll_bg = ScrollBackground(background, display, (0, 0))
+        self.background = ScrollBackground(background, display, (0, 0))
 
         self.player = Player(Vector2(background.get_size()))
-        self.scroll_bg.move_or_center_display()
-        self.scroll_bg.blit(pg.Surface((123, 123)), (300, 300))
-        self.scroll_bg.redraw_display()
+        self.background.move_or_center_display()
+        self.background.blit(pg.Surface((123, 123)), (300, 300))
+        self.background.redraw_display()
 
         self.clock = pg.time.Clock()
         self.running = True
@@ -71,8 +71,8 @@ class Game():
             delta_time = self.clock.tick(60)/1000 * 60
             self.handle_input(delta_time)
             self.player.update(delta_time)
-            self.scroll_bg.center(self.player.rect.center)
-            self.scroll_bg.draw_sprites((self.player,))
+            self.background.center(self.player.rect.center)
+            self.background.draw_sprites((self.player,))
             pg.display.set_caption('FPS: {:.2f}'.format(self.clock.get_fps()))
             pg.display.update()
 
@@ -90,14 +90,14 @@ class Game():
                     self.scale(1 / 2)
                     continue
             elif event.type == pg.VIDEORESIZE:
-                self.scroll_bg.display = (
+                self.background.display = (
                     pg.display.set_mode(event.size, pg.RESIZABLE))
-                self.scroll_bg.move_or_center_display()
-                self.scroll_bg.redraw_display()
+                self.background.move_or_center_display()
+                self.background.redraw_display()
 
 
     def scale(self, factor):
-        self.scroll_bg.zoom *= factor
+        self.background.zoom *= factor
         self.player.scale(factor)
 
 
