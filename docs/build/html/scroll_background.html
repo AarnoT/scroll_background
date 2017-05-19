@@ -1,0 +1,465 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>scroll_background package &#8212; scroll_background 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to scroll_background’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="scroll-background-package">
+<h1>scroll_background package<a class="headerlink" href="#scroll-background-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-scroll_background">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-scroll_background" title="Permalink to this headline">¶</a></h2>
+<p>Package for scrolling a surface in Pygame.</p>
+<dl class="class">
+<dt id="scroll_background.ScrollBackground">
+<em class="property">class </em><code class="descclassname">scroll_background.</code><code class="descname">ScrollBackground</code><span class="sig-paren">(</span><em>background</em>, <em>display</em>, <em>display_pos</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A class for scrolling a Pygame surface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>background</strong> : pygame.Surface</p>
+<p><strong>display</strong> : pygame.Surface</p>
+<p class="last"><strong>display_pos</strong> : Vector2</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>_original_background</td>
+<td>(pygame.Surface) Copy of the original background surface.</td>
+</tr>
+<tr class="row-even"><td>background</td>
+<td>(pygame.Surface) Copy of the original background used for zooming.</td>
+</tr>
+<tr class="row-odd"><td>display</td>
+<td>(pygame.Surface) The display surface.</td>
+</tr>
+<tr class="row-even"><td>true_pos</td>
+<td>(Vector2) Accurate display position.</td>
+</tr>
+<tr class="row-odd"><td>clear_rects</td>
+<td>(list of pygame.Rect) Rects used to clear sprites from the background.</td>
+</tr>
+<tr class="row-even"><td>_zoom</td>
+<td>(float) The factor by which the background is zoomed.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.blit">
+<code class="descname">blit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.blit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blit to _original_background and update background.</p>
+<p>This makes it easier to change the background.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">pygame.Rect</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.center">
+<code class="descname">center</code><span class="sig-paren">(</span><em>point</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.center" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scroll the display so that it is centered on a point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>point</strong> : Vector2</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.centered_pos">
+<code class="descname">centered_pos</code><span class="sig-paren">(</span><em>point</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.centered_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the position where the display is centered on a point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>point</strong> : Vector2</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>centered_pos</strong> : Vector2</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="scroll_background.ScrollBackground.display_pos">
+<code class="descname">display_pos</code><a class="headerlink" href="#scroll_background.ScrollBackground.display_pos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return true_pos mapped to integer values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Vector2</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.draw_sprites">
+<code class="descname">draw_sprites</code><span class="sig-paren">(</span><em>sprites</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.draw_sprites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear previously drawn sprites and draw new ones.</p>
+<p>Sprites can be any objects with pygame.Rect as the .rect
+attribute and a pygame.Surface as the .image attribute. The
+position of the sprites should be relative to the background.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sprites</strong> : iterable of sprites</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>draw_rects</strong> : list of pygame.Rect</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.move_or_center_display">
+<code class="descname">move_or_center_display</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.move_or_center_display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the display onto the background or center it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Centering the display.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">background</span> <span class="o">=</span> <span class="n">ScrollBackground</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">)),</span>
+<span class="gp">... </span>                              <span class="n">pg</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">)),</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">background</span><span class="o">.</span><span class="n">move_or_center_display</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="n">background</span><span class="o">.</span><span class="n">display_pos</span><span class="p">)</span>
+<span class="go">(-100.0, -100.0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.redraw_display">
+<code class="descname">redraw_display</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.redraw_display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw the background to the display.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.redraw_rects">
+<code class="descname">redraw_rects</code><span class="sig-paren">(</span><em>redraw_positions</em>, <em>redraw_areas</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.redraw_rects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redraw the redraw areas from the background to the display.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>redraw_positions</strong> : iterable of Vector2</p>
+<p><strong>redraw_areas</strong> : iterable of pygame.Rect</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.ScrollBackground.scroll">
+<code class="descname">scroll</code><span class="sig-paren">(</span><em>position_change</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.ScrollBackground.scroll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scroll the display by position_change.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>position_change</strong> : Vector2</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Scrolling the display 100 pixels to the right and down.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">background</span> <span class="o">=</span> <span class="n">ScrollBackground</span><span class="p">(</span><span class="n">pg</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">)),</span>
+<span class="gp">... </span>                              <span class="n">pg</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">)),</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">background</span><span class="o">.</span><span class="n">scroll</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="n">background</span><span class="o">.</span><span class="n">display_pos</span><span class="p">)</span>
+<span class="go">(300.0, 300.0)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="scroll_background.ScrollBackground.scrolling_area">
+<code class="descname">scrolling_area</code><a class="headerlink" href="#scroll_background.ScrollBackground.scrolling_area" title="Permalink to this definition">¶</a></dt>
+<dd><p>The area inside which the display can be scrolled.</p>
+<p>The top left corner is always at (0, 0).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>scrolling_area</strong> : pygame.Rect</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="scroll_background.ScrollBackground.zoom">
+<code class="descname">zoom</code><a class="headerlink" href="#scroll_background.ScrollBackground.zoom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the zoom factor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>zoom</strong> : float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="scroll_background.Vector2">
+<em class="property">class </em><code class="descclassname">scroll_background.</code><code class="descname">Vector2</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.Vector2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A utility class that contains an X, and a Y coordinate.</p>
+<p>Two vectors can be added or substracted together. <cite>Vector2</cite> also
+implements the __iter__ method, which makes <cite>Vector2</cite> instances
+easy to convert to another iterable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pos</strong> : iterable of float</p>
+<blockquote class="last">
+<div><p>The X and Y coordinates.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>Adding and substracting vectors.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vector1</span> <span class="o">=</span> <span class="n">Vector2</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vector2</span> <span class="o">=</span> <span class="n">Vector2</span><span class="p">((</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vector1</span> <span class="o">+</span> <span class="n">vector2</span>
+<span class="go">&lt;Vector2(5.0, 7.0)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vector1</span> <span class="o">-</span> <span class="n">vector2</span>
+<span class="go">&lt;Vector2(15.0, 3.0)&gt;</span>
+</pre></div>
+</div>
+<p>Converting an instance of <cite>Vector2</cite> to a <cite>tuple</cite>.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">tuple</span><span class="p">(</span><span class="n">Vector2</span><span class="p">((</span><span class="mi">12</span><span class="p">,</span> <span class="mi">30</span><span class="p">)))</span>
+<span class="go">(12.0, 30.0)</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>x, y</td>
+<td>(float) The X and Y coordinates.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<dl class="method">
+<dt id="scroll_background.Vector2.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.Vector2.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a copy of the vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>copy</strong> : Vector2</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="scroll_background.Vector2.length">
+<code class="descname">length</code><a class="headerlink" href="#scroll_background.Vector2.length" title="Permalink to this definition">¶</a></dt>
+<dd><p>The length of the vector.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>length</strong> : float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="scroll_background.Vector2.scale">
+<code class="descname">scale</code><span class="sig-paren">(</span><em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.Vector2.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiply vector by scale.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>scale</strong> : float</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="scroll_background.Vector2.sequence2vector2">
+<em class="property">classmethod </em><code class="descname">sequence2vector2</code><span class="sig-paren">(</span><em>method</em><span class="sig-paren">)</span><a class="headerlink" href="#scroll_background.Vector2.sequence2vector2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to convert 2-length sequence arguments to vectors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>func</strong> : method</p>
+<blockquote>
+<div><p>The method that will be wrapped.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>wrapper</strong> : function</p>
+<blockquote class="last">
+<div><p>The wrapper function.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">scroll_background package</a><ul>
+<li><a class="reference internal" href="#module-scroll_background">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to scroll_background&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/scroll_background.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, AarnoT.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/scroll_background.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

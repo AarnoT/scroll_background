@@ -10,8 +10,9 @@ Welcome to scroll_background's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   scroll_background
 
+.. include:: ../../README.rst
 
 Indices and tables
 ==================

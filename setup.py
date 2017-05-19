@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='scrolling_background',
-    version='0.1.1',
+    version='0.1.64',
     author='AarnoT',
     url='https://github.com/aarnot/scrolling_background',
     packages=find_packages('src', exclude=['docs', 'tests', 'env']),
