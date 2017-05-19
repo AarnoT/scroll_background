@@ -59,6 +59,7 @@ class Game():
         self.background = ScrollBackground(background, display, (0, 0))
 
         self.player = Player(Vector2(background.get_size()))
+        # Display needs to be centered correctly.
         self.background.move_or_center_display()
         self.background.blit(pg.Surface((123, 123)), (300, 300))
         self.background.redraw_display()
@@ -94,7 +95,6 @@ class Game():
                     pg.display.set_mode(event.size, pg.RESIZABLE))
                 self.background.move_or_center_display()
                 self.background.redraw_display()
-
 
     def scale(self, factor):
         self.background.zoom *= factor
