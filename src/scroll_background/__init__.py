@@ -418,7 +418,10 @@ class ScrollBackground:
         """
         display_rect = pg.Rect(tuple(self.true_pos), self.display.get_size())
         display_rect.clamp_ip(self.scrolling_area)
-        self.true_pos = Vector2(display_rect.topleft)
+        if int(self.true_pos.x) != display_rect.x:
+            self.true_pos.x = display_rect.x
+        if int(self.true_pos.y) != display_rect.y:
+            self.true_pos.y = display_rect.y
 
     @Vector2.sequence2vector2
     def _calculate_redraw_areas(self, position_change):
