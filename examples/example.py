@@ -19,13 +19,13 @@ def fps_counter():
 
 def draw_grid(surface):
     for x in range(0, surface.get_width(), 50):
-        for y in range(0, surface.get_width(), 50):
+        for y in range(0, surface.get_height(), 50):
             pg.draw.rect(surface, (0, 255, 0), (x, y, 50, 50))
     for x in range(0, surface.get_width(), 100):
-        for y in range(50, surface.get_width(), 100):
+        for y in range(50, surface.get_height(), 100):
             pg.draw.rect(surface, (0, 0, 255), (x, y, 50, 50))
     for x in range(50, surface.get_width(), 100):
-        for y in range(0, surface.get_width(), 100):
+        for y in range(0, surface.get_height(), 100):
             pg.draw.rect(surface, (0, 0, 255), (x, y, 50, 50))
 
 
@@ -65,7 +65,7 @@ class Player:
 
 class Game():
     def __init__(self):
-        background = pg.Surface((800, 800))
+        background = pg.Surface((1200, 1200))
         display = pg.display.set_mode((900, 900), pg.RESIZABLE)
         draw_grid(background)
         self.background = ScrollBackground(background, display, (0, 0))
@@ -80,14 +80,23 @@ class Game():
         self.running = True
 
     def main(self):
+        counter = fps_counter()
+        next(counter)
+        draw_rects = []
         while self.running:
-            delta_time = self.clock.tick(60)/1000 * 60
+            delta_time = self.clock.tick(6000)/1000 * 60
             self.handle_input(delta_time)
             self.player.update(delta_time)
+            prev_display_pos = self.background.display_pos
             self.background.center(self.player.rect.center)
-            self.background.draw_sprites((self.player,))
-            pg.display.set_caption('FPS: {:.2f}'.format(self.clock.get_fps()))
-            pg.display.update()
+            sprite_rects = self.background.draw_sprites((self.player,))
+            if self.background.display_pos != prev_display_pos:
+                draw_rects.append(((0, 0), self.background.display.get_size()))
+            else:
+                draw_rects.extend(sprite_rects)
+            counter.send(self.clock.get_fps())
+            pg.display.update(draw_rects)
+            draw_rects.clear()
 
     def handle_input(self, delta_time):
         for event in pg.event.get():
