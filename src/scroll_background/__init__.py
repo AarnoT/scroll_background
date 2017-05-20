@@ -270,7 +270,7 @@ class ScrollBackground:
         Vector2
 
         """
-        return Vector2(map(int, self.true_pos))
+        return Vector2(round(num, 0) for num in self.true_pos)
 
     @display_pos.setter
     @Vector2.sequence2vector2
