@@ -1,8 +1,20 @@
-import pygame as pg
+from collections import deque
 
+import pygame as pg
 from scroll_background import Vector2, ScrollBackground
 
 pg.init()
+
+
+def fps_counter():
+    fps = deque(maxlen=100)
+    counter = 0
+    while True:
+        new_fps = yield
+        fps.append(new_fps)
+        counter = (counter + 1) % 100
+        if counter == 0:
+            pg.display.set_caption('FPS: {:.2f}'.format(sum(fps) / len(fps)))
 
 
 def draw_grid(surface):
