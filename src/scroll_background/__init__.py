@@ -541,6 +541,171 @@ class ScrollBackground:
         return draw_rects
 
 
+class MultipleSurfaceScrollBackground(ScrollBackground):
+    """Subclass of scroll_background that can use more than one surface.
+
+    Parameters
+    ----------
+    background : nested list of pygame.Surface
+        All of the surfaces should be the same size so that they can
+        be combined into a square shape.
+    display : pygame.Surface
+    display_pos : Vector2
+
+    Attributes
+    ----------
+    background_surfaces : nested list of pygame.Surface
+    visible_surfaces : tuple of tuples of int
+        The background surfaces that are currently visible.
+
+    """
+
+    def __init__(self, background, display, display_pos):
+        pass
+
+    @property
+    def scrolling_area(self):
+        """The area inside which the display can be scrolled.
+
+        The top left corner is always at (0, 0).
+
+        Returns
+        -------
+        scrolling_area : pygame.Rect
+
+        """
+        return pg.Rect((0, 0), self.background.get_size())
+
+    def check_visible_surfaces(self):
+        """Return the indices of each visible surface.
+
+        Returns
+        -------
+        indices : nested tuples of int
+
+        """
+
+    def combine_surfaces(self):
+        """Combine visible surfaces and set them as the background.
+
+        Returns
+        -------
+        None
+
+        """
+
+    @zoom.setter
+    def zoom(self, scale):
+        """Create a new zoomed background and scale variables.
+
+        Parameters
+        ----------
+        scale : float
+
+        Returns
+        -------
+        None
+
+        """
+        original_bg_size = self._original_background.get_size()
+        new_width, new_height = (int(size*scale) for size in original_bg_size)
+        self.background = pg.transform.scale(self._original_background,
+                                             (new_width, new_height))
+        self.true_pos.scale(scale)
+        self.move_or_center_display()
+        self.redraw_display()
+        self._zoom = scale
+
+    @Vector2.sequence2vector2
+    def scroll(self, position_change):
+        """Scroll the display by position_change.
+
+        Parameters
+        ----------
+        position_change : Vector2
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        Scrolling the display 100 pixels to the right and down.
+
+        >>> background = ScrollBackground(pg.Surface((600, 600)),
+        ...                               pg.Surface((200, 200)), (200, 200))
+        >>> background.scroll((100, 100))
+        >>> tuple(background.display_pos)
+        (300.0, 300.0)
+
+        """
+        prev_pos = self.display_pos
+        self.true_pos += position_change
+        self.move_or_center_display()
+        position_change = self.display_pos - prev_pos
+
+        self.display.scroll(int(-position_change.x), int(-position_change.y))
+        self.redraw_rects(*self._calculate_redraw_areas(position_change))
+
+    def redraw_rects(self, redraw_positions, redraw_areas):
+        """Redraw the redraw areas from the background to the display.
+
+        Parameters
+        ----------
+        redraw_positions : iterable of Vector2
+        redraw_areas : iterable of pygame.Rect
+
+        Returns
+        -------
+        None
+
+        """
+        for pos, rect in zip(redraw_positions, redraw_areas):
+            self.display.blit(self.background, tuple(pos), rect)
+
+    def redraw_display(self):
+        """Draw the background to the display.
+
+        Returns
+        -------
+        None
+
+        """
+        self.display.fill((0, 0, 0))
+        self.display.blit(self.background, (0, 0),
+                          (tuple(self.display_pos), self.display.get_size()))
+
+    def draw_sprites(self, sprites):
+        """Clear previously drawn sprites and draw new ones.
+
+        Sprites can be any objects with pygame.Rect as the .rect
+        attribute and a pygame.Surface as the .image attribute. The
+        position of the sprites should be relative to the background.
+
+        Parameters
+        ----------
+        sprites : iterable of sprites
+
+        Returns
+        -------
+        draw_rects : list of pygame.Rect
+
+        """
+        draw_rects = []
+        for rect in self.clear_rects:
+            clear_pos = Vector2(rect.topleft) - self.display_pos
+            draw_rects.append(
+                self.display.blit(self.background, tuple(clear_pos), rect))
+        self.clear_rects.clear()
+
+        for sprite in sprites:
+            draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
+            draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
+            self.clear_rects.append(sprite.rect)
+            draw_rects.append(draw_rect)
+        return draw_rects
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
