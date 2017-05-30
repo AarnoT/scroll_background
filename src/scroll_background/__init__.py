@@ -593,6 +593,16 @@ class MultipleSurfaceScrollBackground(ScrollBackground):
         indices : nested tuples of int
 
         """
+        indices = []
+        for j in range(len(self.background_surfaces)):
+            for i, surf in enumerate(self.background_surfaces[j]):
+                surf_rect = pg.Rect((i*surf.get_width(), j*surf.get_height()),
+                                    surf.get_size())
+                display_rect = pg.Rect(
+                    self.display_pos, self.display.get_size())
+                if display_rect.collide_rect(surf_rect):
+                    indices.append((i, j))
+        return indices
 
     def combine_surfaces(self):
         """Combine visible surfaces and set them as the background.
