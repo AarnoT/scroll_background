@@ -585,34 +585,42 @@ class MultiSurfaceBackground(ScrollBackground):
             self.background_surfaces[0][0].get_height())
         return pg.Rect((0, 0), (background_width, background_height))
 
-    def check_visible_surfaces(self):
+    def check_visible_surfaces(self, area=None):
         """Return the indices of each visible surface.
+
+        Arguments
+        ---------
+        area : pygame.Rect
+            The area that is used to check which surfaces are visible.
 
         Returns
         -------
         indices : nested tuples of int
 
         """
+        area = area or pg.Rect(tuple(self.display_pos), self.display.get_size())
         indices = []
         for j in range(len(self.background_surfaces)):
             for i, surf in enumerate(self.background_surfaces[j]):
                 surf_rect = pg.Rect((i*surf.get_width(), j*surf.get_height()),
                                     surf.get_size())
-                display_rect = pg.Rect(
-                    tuple(self.display_pos), self.display.get_size())
-                if display_rect.collide_rect(surf_rect):
+                if area.collide_rect(surf_rect):
                     indices.append((i, j))
         return indices
 
-    def combine_surfaces(self):
+    def combine_surfaces(self, surfaces=None):
         """Combine visible surfaces and set them as the background.
+
+        Arguments
+        ---------
+        surfaces : None or iterable of tuple of int
 
         Returns
         -------
         None
 
         """
-        surfaces = self.check_visible_surfaces()
+        surfaces = surfaces or self.check_visible_surfaces()
         background_width = len(set(surf[0] for surf in surfaces))
         background_height = len(set(surf[1] for surf in surfaces))
         surf_width, surf_height = self.background_surfaces[0].get_size()
@@ -639,14 +647,13 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
-        original_bg_size = self._original_background.get_size()
-        new_width, new_height = (int(size*scale) for size in original_bg_size)
-        self.background = pg.transform.scale(self._original_background,
-                                             (new_width, new_height))
-        self.true_pos.scale(scale)
-        self.move_or_center_display()
-        self.redraw_display()
-        self._zoom = scale
+        display_pos = self.display_pos
+        display_pos.scale(scale)
+        display_size = Vector2(self.display.size())
+        display_size.scale(scale)
+        display_rect = pg.Rect(display_pos, display_size)))
+        self.combine_surfaces(area=self.check_visible_surfaces(display_rect))
+        super().zoom = scale
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
