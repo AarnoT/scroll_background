@@ -546,7 +546,7 @@ class MultipleSurfaceScrollBackground(ScrollBackground):
 
     Parameters
     ----------
-    background : nested list of pygame.Surface
+    background_surfaces : nested list of pygame.Surface
         All of the surfaces should be the same size so that they can
         be combined into a square shape.
     display : pygame.Surface
@@ -555,13 +555,18 @@ class MultipleSurfaceScrollBackground(ScrollBackground):
     Attributes
     ----------
     background_surfaces : nested list of pygame.Surface
-    visible_surfaces : tuple of tuples of int
-        The background surfaces that are currently visible.
+    repeating : bool
+        Boolean that determines whether or not the background should
+        repeat infinitely.
 
     """
 
-    def __init__(self, background, display, display_pos):
-        pass
+    def __init__(self, background_surfaces, display, display_pos,
+                 repeating=False):
+        self.background_surfaces = background_surfaces
+        self.combine_surfaces()
+        super().__init__(self.background, display, display_pos)
+        self.repeating = repeating
 
     @property
     def scrolling_area(self):
