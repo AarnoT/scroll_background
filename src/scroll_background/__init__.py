@@ -579,7 +579,11 @@ class MultipleSurfaceScrollBackground(ScrollBackground):
         scrolling_area : pygame.Rect
 
         """
-        return pg.Rect((0, 0), self.background.get_size())
+        background_width = len(self.background_surfaces[0]) * (
+            self.background_surfaces[0][0].get_width())
+        background_height = len(self.background_surfaces) * (
+            self.background_surfaces[0][0].get_height())
+        return pg.Rect((0, 0), (background_width, background_height))
 
     def check_visible_surfaces(self):
         """Return the indices of each visible surface.
