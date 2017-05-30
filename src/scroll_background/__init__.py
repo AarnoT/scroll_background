@@ -599,7 +599,7 @@ class MultipleSurfaceScrollBackground(ScrollBackground):
                 surf_rect = pg.Rect((i*surf.get_width(), j*surf.get_height()),
                                     surf.get_size())
                 display_rect = pg.Rect(
-                    self.display_pos, self.display.get_size())
+                    tuple(self.display_pos), self.display.get_size())
                 if display_rect.collide_rect(surf_rect):
                     indices.append((i, j))
         return indices
@@ -612,6 +612,19 @@ class MultipleSurfaceScrollBackground(ScrollBackground):
         None
 
         """
+        surfaces = self.check_visible_surfaces()
+        background_width = len(set(surf[0] for surf in surfaces))
+        background_height = len(set(surf[1] for surf in surfaces))
+        surf_width, surf_height = self.background_surfaces[0].get_size()
+        left = int(self.display_pos.x / surf_width)
+        top = int(self.display_pos.y / surf_height)
+        self.background = pg.Surface((
+            background_width*surf_width, background_height*surf_height))
+        for surf_x, surf_y in surfaces:
+            surf = self.background_surfaces[surf_y][surf_x]
+            pos = (max(surf_x - left, 0) * surf_width,
+                   max(surf_y - top, 0) * surf_height)
+            self.background.blit(surf, pos)
 
     @zoom.setter
     def zoom(self, scale):
