@@ -541,7 +541,7 @@ class ScrollBackground:
         return draw_rects
 
 
-class MultipleSurfaceScrollBackground(ScrollBackground):
+class MultiSurfaceBackground(ScrollBackground):
     """Subclass of scroll_background that can use more than one surface.
 
     Parameters
