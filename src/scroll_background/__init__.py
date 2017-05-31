@@ -624,15 +624,30 @@ class MultiSurfaceBackground(ScrollBackground):
         background_width = len(set(surf[0] for surf in surfaces))
         background_height = len(set(surf[1] for surf in surfaces))
         surf_width, surf_height = self.background_surfaces[0].get_size()
-        left = int(self.display_pos.x / surf_width)
-        top = int(self.display_pos.y / surf_height)
         self.background = pg.Surface((
             background_width*surf_width, background_height*surf_height))
         for surf_x, surf_y in surfaces:
             surf = self.background_surfaces[surf_y][surf_x]
-            pos = (max(surf_x - left, 0) * surf_width,
-                   max(surf_y - top, 0) * surf_height)
-            self.background.blit(surf, pos)
+            pos = self.offset_position((surf_x, surf_y))
+            self.background.blit(surf, tuple(pos))
+
+    @Vector2.sequence2vector2
+    def offset_position(self, pos):
+        """Make a position relative to the currently visible surfaces.
+
+        Arguments
+        ---------
+        pos : Vector2
+
+        Returns
+        -------
+        offset_pos : Vector2
+
+        """
+        surf_width, surf_height = self.background_surfaces[0].get_size()
+        left = int(self.display_pos.x / surf_width) * surf_width
+        top = int(self.display_pos.y / surf_height) * surf_height
+        return max(pos.x - left, 0), max(pos.y - top, 0)
 
     @zoom.setter
     def zoom(self, scale):
@@ -703,12 +718,8 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
-        surf_width, surf_height = self.background_surfaces[0].get_size()
-        left = int(self.display_pos.x / surf_width) * surf_width
-        top = int(self.display_pos.y / surf_height) * surf_height
         for pos, rect in zip(redraw_positions, redraw_areas):
-            pos = (max(self.display_pos.x - left, 0),
-                   max(self.display_pos.y - top, 0))
+            pos = self.offset_position(pos)
             self.display.blit(self.background, tuple(pos), rect)
 
     def redraw_display(self):
@@ -720,13 +731,10 @@ class MultiSurfaceBackground(ScrollBackground):
 
         """
         surf_width, surf_height = self.background_surfaces[0].get_size()
-        left = int(self.display_pos.x / surf_width) * surf_width
-        top = int(self.display_pos.y / surf_height) * surf_height
-        pos = (max(self.display_pos.x - left, 0),
-               max(self.display_pos.y - top, 0))
+        pos = self.offset_position(self.display_pos)
         self.display.fill((0, 0, 0))
         self.display.blit(self.background, (0, 0),
-                          (pos, self.display.get_size()))
+                          (tuple(pos), self.display.get_size()))
 
     def draw_sprites(self, sprites):
         """Clear previously drawn sprites and draw new ones.
