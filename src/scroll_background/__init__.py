@@ -678,10 +678,14 @@ class MultiSurfaceBackground(ScrollBackground):
         (300.0, 300.0)
 
         """
+        prev_surfaces = self.check_visible_surfaces()
         prev_pos = self.display_pos
         self.true_pos += position_change
         self.move_or_center_display()
         position_change = self.display_pos - prev_pos
+        curr_surfaces = self.check_visible_surfaces()
+        if prev_surfaces != curr_surfaces:
+            self.combine_surfaces(surfaces=curr_surfaces)
 
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
