@@ -651,7 +651,7 @@ class MultiSurfaceBackground(ScrollBackground):
         display_pos.scale(scale)
         display_size = Vector2(self.display.size())
         display_size.scale(scale)
-        display_rect = pg.Rect(display_pos, display_size)))
+        display_rect = pg.Rect(display_pos, display_size)
         self.combine_surfaces(area=self.check_visible_surfaces(display_rect))
         super().zoom = scale
 
@@ -703,7 +703,12 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
+        surf_width, surf_height = self.background_surfaces[0].get_size()
+        left = int(self.display_pos.x / surf_width)
+        top = int(self.display_pos.y / surf_height)
         for pos, rect in zip(redraw_positions, redraw_areas):
+            pos = (max(tuple(pos)[0] - left, 0) * surf_width,
+                   max(tuple(pos)[1] - top, 0) * surf_height)
             self.display.blit(self.background, tuple(pos), rect)
 
     def redraw_display(self):
