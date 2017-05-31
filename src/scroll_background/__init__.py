@@ -649,6 +649,12 @@ class MultiSurfaceBackground(ScrollBackground):
         top = int(self.display_pos.y / surf_height) * surf_height
         return max(pos.x - left, 0), max(pos.y - top, 0)
 
+
+    @property
+    def zoom(self):
+        return super().zoom
+
+
     @zoom.setter
     def zoom(self, scale):
         """Create a new zoomed background and scale variables.
@@ -737,11 +743,7 @@ class MultiSurfaceBackground(ScrollBackground):
                           (tuple(pos), self.display.get_size()))
 
     def draw_sprites(self, sprites):
-        """Clear previously drawn sprites and draw new ones.
-
-        Sprites can be any objects with pygame.Rect as the .rect
-        attribute and a pygame.Surface as the .image attribute. The
-        position of the sprites should be relative to the background.
+        """Offset clear positions before calling the parent method.
 
         Parameters
         ----------
@@ -752,19 +754,9 @@ class MultiSurfaceBackground(ScrollBackground):
         draw_rects : list of pygame.Rect
 
         """
-        draw_rects = []
-        for rect in self.clear_rects:
-            clear_pos = Vector2(rect.topleft) - self.display_pos
-            draw_rects.append(
-                self.display.blit(self.background, tuple(clear_pos), rect))
-        self.clear_rects.clear()
-
-        for sprite in sprites:
-            draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
-            draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
-            self.clear_rects.append(sprite.rect)
-            draw_rects.append(draw_rect)
-        return draw_rects
+        for pos in self.clear_rects:
+            pos.topleft = tuple(self.offset_position(pos.topleft))
+        return super().draw_sprites(sprites)
 
 
 if __name__ == "__main__":
