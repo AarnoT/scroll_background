@@ -563,9 +563,9 @@ class MultiSurfaceBackground(ScrollBackground):
 
     def __init__(self, background_surfaces, display, display_pos,
                  repeating=False):
+        super().__init__(pg.Surface((1, 1)), display, display_pos)
         self.background_surfaces = background_surfaces
         self.combine_surfaces()
-        super().__init__(self.background, display, display_pos)
         self.repeating = repeating
 
     @property
@@ -604,7 +604,7 @@ class MultiSurfaceBackground(ScrollBackground):
             for i, surf in enumerate(self.background_surfaces[j]):
                 surf_rect = pg.Rect((i*surf.get_width(), j*surf.get_height()),
                                     surf.get_size())
-                if area.collide_rect(surf_rect):
+                if area.colliderect(surf_rect):
                     indices.append((i, j))
         return indices
 
@@ -623,12 +623,13 @@ class MultiSurfaceBackground(ScrollBackground):
         surfaces = surfaces or self.check_visible_surfaces()
         background_width = len(set(surf[0] for surf in surfaces))
         background_height = len(set(surf[1] for surf in surfaces))
-        surf_width, surf_height = self.background_surfaces[0].get_size()
+        surf_width, surf_height = self.background_surfaces[0][0].get_size()
         self.background = pg.Surface((
             background_width*surf_width, background_height*surf_height))
         for surf_x, surf_y in surfaces:
             surf = self.background_surfaces[surf_y][surf_x]
-            pos = self.offset_position((surf_x, surf_y))
+            pos = self.offset_position(
+                (surf_x * surf_width, surf_y * surf_height))
             self.background.blit(surf, tuple(pos))
 
     @Vector2.sequence2vector2
@@ -644,18 +645,12 @@ class MultiSurfaceBackground(ScrollBackground):
         offset_pos : Vector2
 
         """
-        surf_width, surf_height = self.background_surfaces[0].get_size()
+        surf_width, surf_height = self.background_surfaces[0][0].get_size()
         left = int(self.display_pos.x / surf_width) * surf_width
         top = int(self.display_pos.y / surf_height) * surf_height
-        return max(pos.x - left, 0), max(pos.y - top, 0)
+        return Vector2((pos.x - left, pos.y - top))
 
-
-    @property
-    def zoom(self):
-        return super().zoom
-
-
-    @zoom.setter
+    @ScrollBackground.zoom.setter
     def zoom(self, scale):
         """Create a new zoomed background and scale variables.
 
@@ -668,13 +663,16 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
-        display_pos = self.display_pos
-        display_pos.scale(scale)
-        display_size = Vector2(self.display.size())
-        display_size.scale(scale)
-        display_rect = pg.Rect(display_pos, display_size)
-        self.combine_surfaces(area=self.check_visible_surfaces(display_rect))
-        super().zoom = scale
+        original_size = self.background_surfaces[0][0].get_size()
+        new_width, new_height = (int(size*scale) for size in original_size)
+        for j in range(len(self.background_surfaces)):
+            for i in range(len(self.background_surfaces[0])):
+                self.background_surfaces[j][i] = pg.transform.scale(
+                    self.background_surfaces[j][i], (new_width, new_height))
+        self.true_pos.scale(scale)
+        self.move_or_center_display()
+        self.redraw_display()
+        self._zoom = scale
 
     @Vector2.sequence2vector2
     def scroll(self, position_change):
@@ -725,7 +723,7 @@ class MultiSurfaceBackground(ScrollBackground):
 
         """
         for pos, rect in zip(redraw_positions, redraw_areas):
-            pos = self.offset_position(pos)
+            rect.topleft = tuple(self.offset_position(rect.topleft))
             self.display.blit(self.background, tuple(pos), rect)
 
     def redraw_display(self):
@@ -736,14 +734,18 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
-        surf_width, surf_height = self.background_surfaces[0].get_size()
+        surf_width, surf_height = self.background_surfaces[0][0].get_size()
         pos = self.offset_position(self.display_pos)
         self.display.fill((0, 0, 0))
         self.display.blit(self.background, (0, 0),
                           (tuple(pos), self.display.get_size()))
 
     def draw_sprites(self, sprites):
-        """Offset clear positions before calling the parent method.
+        """Clear previously drawn sprites and draw new ones.
+
+        Sprites can be any objects with pygame.Rect as the .rect
+        attribute and a pygame.Surface as the .image attribute. The
+        position of the sprites should be relative to the background.
 
         Parameters
         ----------
@@ -754,9 +756,20 @@ class MultiSurfaceBackground(ScrollBackground):
         draw_rects : list of pygame.Rect
 
         """
-        for pos in self.clear_rects:
-            pos.topleft = tuple(self.offset_position(pos.topleft))
-        return super().draw_sprites(sprites)
+        draw_rects = []
+        for rect in self.clear_rects:
+            clear_pos = Vector2(rect.topleft) - self.display_pos
+            rect.topleft = tuple(self.offset_position(rect.topleft))
+            draw_rects.append(
+                self.display.blit(self.background, tuple(clear_pos), rect))
+        self.clear_rects.clear()
+
+        for sprite in sprites:
+            draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
+            draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
+            self.clear_rects.append(sprite.rect)
+            draw_rects.append(draw_rect)
+        return draw_rects
 
 
 if __name__ == "__main__":
