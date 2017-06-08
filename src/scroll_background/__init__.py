@@ -554,6 +554,7 @@ class MultiSurfaceBackground(ScrollBackground):
 
     Attributes
     ----------
+    _original_background_surfaces : nested list of pygame.Surface
     background_surfaces : nested list of pygame.Surface
     repeating : bool
         Boolean that determines whether or not the background should
@@ -564,7 +565,10 @@ class MultiSurfaceBackground(ScrollBackground):
     def __init__(self, background_surfaces, display, display_pos,
                  repeating=False):
         super().__init__(pg.Surface((1, 1)), display, display_pos)
-        self.background_surfaces = background_surfaces
+        self._original_background_surfaces = [
+            surf.copy() for surf in background_surfaces]
+        self.background_surfaces = [
+            surf.copy() for surf in background_surfaces]
         self.combine_surfaces()
         self.repeating = repeating
 
@@ -663,12 +667,13 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
-        original_size = self.background_surfaces[0][0].get_size()
+        original_size = self._original_background_surfaces[0][0].get_size()
         new_width, new_height = (int(size*scale) for size in original_size)
         for j in range(len(self.background_surfaces)):
             for i in range(len(self.background_surfaces[0])):
                 self.background_surfaces[j][i] = pg.transform.scale(
-                    self.background_surfaces[j][i], (new_width, new_height))
+                    self._original_background_surfaces[j][i],
+                    (new_width, new_height))
         self.true_pos.scale(scale)
         self.move_or_center_display()
         self.redraw_display()
