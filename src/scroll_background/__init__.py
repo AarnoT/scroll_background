@@ -676,6 +676,9 @@ class MultiSurfaceBackground(ScrollBackground):
                     (new_width, new_height))
         self.true_pos.scale(scale)
         self.move_or_center_display()
+        new_center = self.display_pos.copy() + Vector2(self.display.get_size())
+        new_center.scale(0.5)
+        self.center(new_center)
         self.redraw_display()
         self._zoom = scale
 
