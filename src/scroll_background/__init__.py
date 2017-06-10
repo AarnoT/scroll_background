@@ -590,7 +590,7 @@ class MultiSurfaceBackground(ScrollBackground):
         return pg.Rect((0, 0), (background_width, background_height))
 
     def check_visible_surfaces(self, area=None):
-        """Return the indices of each visible surface.
+        """Return a rect that represents each visible surface.
 
         Arguments
         ---------
@@ -599,42 +599,47 @@ class MultiSurfaceBackground(ScrollBackground):
 
         Returns
         -------
-        indices : nested tuples of int
+        pygame.Rect
 
         """
-        area = area or pg.Rect(tuple(self.display_pos), self.display.get_size())
-        indices = []
-        for j in range(len(self.background_surfaces)):
-            for i, surf in enumerate(self.background_surfaces[j]):
-                surf_rect = pg.Rect((i*surf.get_width(), j*surf.get_height()),
-                                    surf.get_size())
-                if area.colliderect(surf_rect):
-                    indices.append((i, j))
-        return indices
+        surf_width, surf_height = self.background_surfaces[0][0].get_size()
 
-    def combine_surfaces(self, surfaces=None):
+        left = int(self.display_pos.x/surf_width)
+        top = int(self.display_pos.y/surf_height)
+        right = int(
+            (self.display_pos.x + self.display.get_width())/surf_width) + 1
+        bottom = int(
+            (self.display_pos.y + self.display.get_height())/surf_height) + 1
+        return pg.Rect(left, top, right - left - 1, bottom - top - 1)
+
+    def combine_surfaces(self, surface_rect=None):
         """Combine visible surfaces and set them as the background.
 
         Arguments
         ---------
-        surfaces : None or iterable of tuple of int
+        surface_rect : pg.Rect
+            Rectangle that represents the surfaces.
 
         Returns
         -------
         None
 
         """
-        surfaces = surfaces or self.check_visible_surfaces()
-        background_width = len(set(surf[0] for surf in surfaces))
-        background_height = len(set(surf[1] for surf in surfaces))
+        surface_rect = surface_rect or self.check_visible_surfaces()
         surf_width, surf_height = self.background_surfaces[0][0].get_size()
+        x_surfs = len(self.background_surfaces[0])
+        y_surfs = len(self.background_surfaces)
+
         self.background = pg.Surface((
-            background_width*surf_width, background_height*surf_height))
-        for surf_x, surf_y in surfaces:
-            surf = self.background_surfaces[surf_y][surf_x]
-            pos = self.offset_position(
-                (surf_x * surf_width, surf_y * surf_height))
-            self.background.blit(surf, tuple(pos))
+            (surface_rect.width + 1) * surf_width,
+            (surface_rect.height + 1) * surf_height))
+
+        for j in range(surface_rect.top, surface_rect.bottom + 1):
+            for i in range(surface_rect.left, surface_rect.right + 1):
+                pos = Vector2((i - surface_rect.left, j - surface_rect.top))
+                self.background.blit(
+                    self.background_surfaces[j % y_surfs][i % x_surfs],
+                    (pos.x * surf_width, pos.y * surf_height))
 
     @Vector2.sequence2vector2
     def offset_position(self, pos):
@@ -705,14 +710,14 @@ class MultiSurfaceBackground(ScrollBackground):
         (300.0, 300.0)
 
         """
-        prev_surfaces = self.check_visible_surfaces()
+        prev_surf_rect = self.check_visible_surfaces()
         prev_pos = self.display_pos
         self.true_pos += position_change
-        self.move_or_center_display()
+        #self.move_or_center_display()
         position_change = self.display_pos - prev_pos
-        curr_surfaces = self.check_visible_surfaces()
-        if prev_surfaces != curr_surfaces:
-            self.combine_surfaces(surfaces=curr_surfaces)
+        curr_surf_rect = self.check_visible_surfaces()
+        if prev_surf_rect != curr_surf_rect:
+            self.combine_surfaces(surface_rect=curr_surf_rect)
 
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
