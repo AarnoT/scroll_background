@@ -604,13 +604,13 @@ class MultiSurfaceBackground(ScrollBackground):
         """
         surf_width, surf_height = self.background_surfaces[0][0].get_size()
 
-        left = int(self.display_pos.x/surf_width)
-        top = int(self.display_pos.y/surf_height)
-        right = int(
-            (self.display_pos.x + self.display.get_width())/surf_width) + 1
-        bottom = int(
-            (self.display_pos.y + self.display.get_height())/surf_height) + 1
-        return pg.Rect(left, top, right - left - 1, bottom - top - 1)
+        left = math.floor(self.display_pos.x/surf_width)
+        top = math.floor(self.display_pos.y/surf_height)
+        right = math.floor(
+            (self.display_pos.x + self.display.get_width())/surf_width)
+        bottom = math.floor(
+            (self.display_pos.y + self.display.get_height())/surf_height)
+        return pg.Rect(left, top, right - left, bottom - top)
 
     def combine_surfaces(self, surface_rect=None):
         """Combine visible surfaces and set them as the background.
@@ -637,8 +637,10 @@ class MultiSurfaceBackground(ScrollBackground):
         for j in range(surface_rect.top, surface_rect.bottom + 1):
             for i in range(surface_rect.left, surface_rect.right + 1):
                 pos = Vector2((i - surface_rect.left, j - surface_rect.top))
+                surf_x = abs(i % (x_surfs * (int(i / (abs(i) or 1)) or 1)))
+                surf_y = abs(j % (y_surfs * (int(j / (abs(j) or 1)) or 1)))
                 self.background.blit(
-                    self.background_surfaces[j % y_surfs][i % x_surfs],
+                    self.background_surfaces[surf_y][surf_x],
                     (pos.x * surf_width, pos.y * surf_height))
 
     @Vector2.sequence2vector2
@@ -655,8 +657,8 @@ class MultiSurfaceBackground(ScrollBackground):
 
         """
         surf_width, surf_height = self.background_surfaces[0][0].get_size()
-        left = int(self.display_pos.x / surf_width) * surf_width
-        top = int(self.display_pos.y / surf_height) * surf_height
+        left = math.floor(self.display_pos.x / surf_width) * surf_width
+        top = math.floor(self.display_pos.y / surf_height) * surf_height
         return Vector2((pos.x - left, pos.y - top))
 
     @ScrollBackground.zoom.setter
