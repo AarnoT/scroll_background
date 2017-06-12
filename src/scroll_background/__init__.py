@@ -551,14 +551,15 @@ class MultiSurfaceBackground(ScrollBackground):
         be combined into a square shape.
     display : pygame.Surface
     display_pos : Vector2
+    repeating : bool
+        Boolean that determines whether the background should
+        repeat infinitely.
 
     Attributes
     ----------
     _original_background_surfaces : nested list of pygame.Surface
     background_surfaces : nested list of pygame.Surface
     repeating : bool
-        Boolean that determines whether or not the background should
-        repeat infinitely.
 
     """
 
@@ -589,13 +590,8 @@ class MultiSurfaceBackground(ScrollBackground):
             self.background_surfaces[0][0].get_height())
         return pg.Rect((0, 0), (background_width, background_height))
 
-    def check_visible_surfaces(self, area=None):
+    def check_visible_surfaces(self):
         """Return a rect that represents each visible surface.
-
-        Arguments
-        ---------
-        area : pygame.Rect
-            The area that is used to check which surfaces are visible.
 
         Returns
         -------
@@ -701,21 +697,12 @@ class MultiSurfaceBackground(ScrollBackground):
         -------
         None
 
-        Examples
-        --------
-        Scrolling the display 100 pixels to the right and down.
-
-        >>> background = ScrollBackground(pg.Surface((600, 600)),
-        ...                               pg.Surface((200, 200)), (200, 200))
-        >>> background.scroll((100, 100))
-        >>> tuple(background.display_pos)
-        (300.0, 300.0)
-
         """
         prev_surf_rect = self.check_visible_surfaces()
         prev_pos = self.display_pos
         self.true_pos += position_change
-        #self.move_or_center_display()
+        if not self.repeating:
+            self.move_or_center_display()
         position_change = self.display_pos - prev_pos
         curr_surf_rect = self.check_visible_surfaces()
         if prev_surf_rect != curr_surf_rect:
