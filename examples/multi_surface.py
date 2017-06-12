@@ -1,6 +1,8 @@
 from collections import deque
+import sys
 
 import pygame as pg
+#sys.path.insert(0, 'src')
 from scroll_background import Vector2, MultiSurfaceBackground
 
 pg.init()
@@ -118,6 +120,7 @@ class Game():
 
     def scale(self, factor):
         self.background.zoom *= factor
+        pg.display.update()
         self.player.scale(factor)
 
 
