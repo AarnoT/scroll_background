@@ -573,6 +573,23 @@ class MultiSurfaceBackground(ScrollBackground):
         self.combine_surfaces()
         self.repeating = repeating
 
+    def blit(self, *args, **kwargs):
+        """Blit to _original_background and update background.
+
+        This makes it easier to change the background.
+
+        Returns
+        -------
+        pygame.Rect
+
+        """
+        args = list(args)
+        args[1] = tuple(self.offset_position(args[1]))
+        blit_rect = self._original_background.blit(*args, **kwargs)
+        # Update background.
+        self.zoom = self._zoom
+        return blit_rect
+
     @property
     def scrolling_area(self):
         """The area inside which the display can be scrolled.
