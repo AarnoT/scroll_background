@@ -542,7 +542,10 @@ class ScrollBackground:
 
 
 class MultiSurfaceBackground(ScrollBackground):
-    """Subclass of scroll_background that can use more than one surface.
+    """Subclass of ScrollBackground that can use more than one surface.
+
+    You should use this if your background is large or you want a
+    background that repeats infinitely.
 
     Parameters
     ----------
