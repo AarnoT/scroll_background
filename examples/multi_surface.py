@@ -87,8 +87,7 @@ class Game():
             self.handle_input(delta_time)
             self.player.update(delta_time)
             prev_display_pos = self.background.display_pos
-            player_size = Vector2(self.player.rect.size)
-            player_size.scale(0.5)
+            player_size = Vector2(self.player.rect.size).scale(0.5)
             self.background.center(Vector2(self.player.true_pos) + player_size)
             sprite_rects = self.background.draw_sprites((self.player,))
             if self.background.display_pos != prev_display_pos:
