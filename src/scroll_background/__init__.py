@@ -94,7 +94,7 @@ class Vector2:
         tuple of int
 
         """
-        return (self.x, self.y)
+        return (int(self.x), int(self.y))
 
     def __eq__(self, other):
         """Test if two vectors are equal.
