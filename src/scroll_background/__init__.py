@@ -86,6 +86,16 @@ class Vector2:
         """
         return Vector2((self.x, self.y))
 
+    def asint(self):
+        """Return a tuple with the x and y values as integers.
+
+        Returns
+        -------
+        tuple of int
+
+        """
+        return (self.x, self.y)
+
     def __eq__(self, other):
         """Test if two vectors are equal.
 
