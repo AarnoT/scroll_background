@@ -69,11 +69,12 @@ class Vector2:
 
         Returns
         -------
-        None
+        self : Vector2
 
         """
         self.x *= scale
         self.y *= scale
+        return self
 
     def copy(self):
         """Return a copy of the vector.
