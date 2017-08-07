@@ -122,6 +122,7 @@ class Game():
     def scale(self, factor):
         self.background.zoom *= factor
         self.player.scale(factor)
+        pg.display.update()
 
 
 if __name__ == '__main__':
