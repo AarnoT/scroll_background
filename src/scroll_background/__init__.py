@@ -257,20 +257,26 @@ class ScrollBackground:
         self.clear_rects = []
         self._zoom = 1.0
 
-    def blit(self, *args, **kwargs):
-        """Blit to _original_background and update background.
-
-        This makes it easier to change the background.
+    def blit(self, source, dest, area=None, special_flags=0):
+        """Scale arguments and blit them to the display surface.
 
         Returns
         -------
         pygame.Rect
 
         """
-        blit_rect = self._original_background.blit(*args, **kwargs)
-        # Update background.
-        self.zoom = self._zoom
-        return blit_rect
+        # Scale arguments based on zoom factor.
+        source_size = Vector2(source.get_size()).scale(self.zoom).asint()
+        source = pg.transform.scale(source, tuple(source_size))
+        dest = Vector2(dest).scale(self.zoom).asint()
+        if area is not None:
+            area.topleft = Vector2(area.topleft).scale(self.zoom).asint()
+            area.size = Vector2(area.size).scale(self.zoom).asint()
+            area.topleft = (Vector2(area.topleft) - self.display_pos).asint()
+
+        draw_pos = (Vector2(dest) - self.display_pos).asint()
+        draw_rect = self.display.blit(source, draw_pos, area, special_flags)
+        return draw_rect
 
     @property
     def display_pos(self):
@@ -586,23 +592,6 @@ class MultiSurfaceBackground(ScrollBackground):
             surf.copy() for surf in background_surfaces]
         self.combine_surfaces()
         self.repeating = repeating
-
-    def blit(self, *args, **kwargs):
-        """Blit to _original_background and update background.
-
-        This makes it easier to change the background.
-
-        Returns
-        -------
-        pygame.Rect
-
-        """
-        args = list(args)
-        args[1] = tuple(self.offset_position(args[1]))
-        blit_rect = self._original_background.blit(*args, **kwargs)
-        # Update background.
-        self.zoom = self._zoom
-        return blit_rect
 
     @property
     def scrolling_area(self):
