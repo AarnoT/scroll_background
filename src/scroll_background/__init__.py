@@ -580,6 +580,8 @@ class MultiSurfaceBackground(ScrollBackground):
     _original_background_surfaces : nested list of pygame.Surface
     background_surfaces : nested list of pygame.Surface
     repeating : bool
+    self.prev_surf_rect : pygame.Rect
+        Tracks which surfaces were previously visible.
 
     """
 
@@ -592,6 +594,7 @@ class MultiSurfaceBackground(ScrollBackground):
             surf.copy() for surf in background_surfaces]
         self.combine_surfaces()
         self.repeating = repeating
+        self.prev_surf_rect = self.check_visible_surfaces()
 
     @property
     def scrolling_area(self):
@@ -697,11 +700,12 @@ class MultiSurfaceBackground(ScrollBackground):
                 self.background_surfaces[j][i] = pg.transform.scale(
                     self._original_background_surfaces[j][i],
                     (new_width, new_height))
-        self.true_pos.scale(scale)
-        self.move_or_center_display()
-        new_center = self.display_pos.copy() + Vector2(self.display.get_size())
-        new_center.scale(0.5)
+        self.true_pos.scale(scale / self.zoom)
+        new_center = (
+            self.display_pos.copy() +
+            Vector2(self.display.get_size()).scale(scale / (self.zoom*2)))
         self.center(new_center)
+        self.combine_surfaces()
         self.redraw_display()
         self._zoom = scale
 
@@ -718,15 +722,15 @@ class MultiSurfaceBackground(ScrollBackground):
         None
 
         """
-        prev_surf_rect = self.check_visible_surfaces()
         prev_pos = self.display_pos
         self.true_pos += position_change
         if not self.repeating:
             self.move_or_center_display()
         position_change = self.display_pos - prev_pos
         curr_surf_rect = self.check_visible_surfaces()
-        if prev_surf_rect != curr_surf_rect:
+        if self.prev_surf_rect != curr_surf_rect:
             self.combine_surfaces(surface_rect=curr_surf_rect)
+            self.prev_surf_rect = curr_surf_rect
 
         self.display.scroll(int(-position_change.x), int(-position_change.y))
         self.redraw_rects(*self._calculate_redraw_areas(position_change))
