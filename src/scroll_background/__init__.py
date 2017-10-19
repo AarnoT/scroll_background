@@ -553,7 +553,7 @@ class ScrollBackground:
         for sprite in sprites:
             draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
             draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
-            self.clear_rects.append(sprite.rect)
+            self.clear_rects.append(sprite.rect.copy())
             draw_rects.append(draw_rect)
         return draw_rects
 
@@ -793,7 +793,7 @@ class MultiSurfaceBackground(ScrollBackground):
         for sprite in sprites:
             draw_pos = Vector2(sprite.rect.topleft) - self.display_pos
             draw_rect = self.display.blit(sprite.image, tuple(draw_pos))
-            self.clear_rects.append(sprite.rect)
+            self.clear_rects.append(sprite.rect.copy())
             draw_rects.append(draw_rect)
         return draw_rects
 
