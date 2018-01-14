@@ -4,10 +4,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='scrolling_background',
+    name='scroll_background',
     version='1.0.5',
     author='AarnoT',
-    url='https://github.com/aarnot/scrolling_background',
+    url='https://github.com/aarnot/scroll_background',
     packages=find_packages('src', exclude=['docs', 'tests', 'env']),
     package_dir={'': 'src'},
     install_requires=['pygame == 1.9.3'],
